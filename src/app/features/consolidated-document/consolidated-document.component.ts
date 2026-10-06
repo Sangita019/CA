@@ -97,6 +97,7 @@ export class ConsolidatedDocumentComponent {
   readonly ocrResult = signal<OcrResult | null>(null);
   readonly ocrLoading = signal(false);
   readonly saving = signal(false);
+  readonly uploadMessage = signal<string | null>(null);
 
   readonly documentIdControl = new FormControl('', { nonNullable: true });
 
@@ -153,23 +154,59 @@ export class ConsolidatedDocumentComponent {
 
   filesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const selectedFiles = Array.from(input.files ?? []);
-    const validFiles = this.validateFiles(selectedFiles);
-
-    this.revokeUrls(this.files());
-
-    const uploaded = validFiles.map((file, index) => ({
-      id: `${file.name}-${file.lastModified}-${index}`,
-      name: file.name,
-      type: this.isPdf(file) ? 'pdf' as const : 'image' as const,
-      size: file.size,
-      objectUrl: URL.createObjectURL(file)
-    }));
-
-    this.files.set(uploaded);
-    this.previewFileId.set(uploaded[0]?.id ?? null);
-    this.ocrResult.set(null);
+    this.addFiles(input.files);
     input.value = '';
+  }
+
+  addFiles(fileList: FileList | null): void {
+    if (!fileList?.length) {
+      return;
+    }
+
+    const selectedFiles = Array.from(fileList);
+    const currentFiles = this.files();
+    const hasPdf = currentFiles.some((file) => file.type === 'pdf');
+    const selectedPdfs = selectedFiles.filter((file) => this.isPdf(file));
+    const selectedImages = selectedFiles.filter((file) => this.isImage(file));
+    const invalidCount = selectedFiles.length - selectedPdfs.length - selectedImages.length;
+
+    if (invalidCount > 0) {
+      this.uploadMessage.set('Only PDF, JPEG, JPG, JFIF and PNG files are supported.');
+      return;
+    }
+
+    if (hasPdf || selectedPdfs.length > 0) {
+      if (currentFiles.length > 0 || selectedPdfs.length !== 1 || selectedImages.length > 0) {
+        this.uploadMessage.set('Upload either one PDF or up to five image files.');
+        return;
+      }
+    }
+
+    if (!hasPdf && currentFiles.length + selectedImages.length > 5) {
+      this.uploadMessage.set('You can upload a maximum of five image files.');
+      return;
+    }
+
+    const existingKeys = new Set(currentFiles.map((file) => `${file.name}-${file.size}`));
+    const uploaded = selectedFiles
+      .filter((file) => !existingKeys.has(`${file.name}-${file.size}`))
+      .map((file, index) => ({
+        id: `${file.name}-${file.size}-${file.lastModified}-${index}`,
+        name: file.name,
+        type: this.isPdf(file) ? 'pdf' as const : 'image' as const,
+        size: file.size,
+        objectUrl: URL.createObjectURL(file)
+      }));
+
+    if (!uploaded.length) {
+      this.uploadMessage.set('The selected file is already uploaded.');
+      return;
+    }
+
+    this.files.set([...currentFiles, ...uploaded]);
+    this.previewFileId.set(this.previewFileId() ?? uploaded[0].id);
+    this.ocrResult.set(null);
+    this.uploadMessage.set(null);
   }
 
   removeFile(fileId: string): void {
@@ -211,17 +248,6 @@ export class ConsolidatedDocumentComponent {
     this.saving.set(true);
     this.saved.emit();
     this.saving.set(false);
-  }
-
-  private validateFiles(files: readonly File[]): readonly File[] {
-    const pdfs = files.filter((file) => this.isPdf(file));
-    if (pdfs.length > 1 || (pdfs.length === 1 && files.length > 1)) {
-      return pdfs.slice(0, 1);
-    }
-
-    return files
-      .filter((file) => this.isImage(file))
-      .slice(0, 5);
   }
 
   private isPdf(file: File): boolean {
