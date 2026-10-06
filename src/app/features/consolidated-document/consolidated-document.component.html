@@ -56,10 +56,18 @@
                   accept=".pdf,.jpeg,.jpg,.jfif,.png,application/pdf,image/jpeg,image/png"
                   (change)="filesSelected($event)" />
 
-                <button mat-stroked-button type="button" (click)="fileInput.click()">
-                  Upload file(s)
-                </button>
+                <div class="upload-actions">
+                  <button mat-stroked-button type="button" (click)="fileInput.click()">
+                    Upload file(s)
+                  </button>
+                  @if (files().length) {
+                    <span class="upload-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
+                  }
+                </div>
               </div>
+              @if (uploadMessage(); as message) {
+                <p class="upload-message" role="alert">{{ message }}</p>
+              }
 
               <div class="workspace__grid">
                 <section class="panel" aria-labelledby="uploaded-files-title">
