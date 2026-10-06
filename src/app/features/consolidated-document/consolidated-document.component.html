@@ -1,0 +1,161 @@
+<section class="screen" aria-labelledby="consolidated-document-title">
+  <header class="screen__header">
+    <div>
+      <h1 id="consolidated-document-title">Consolidated Document</h1>
+      <p>Select the applicable document, upload files and trigger OCR.</p>
+    </div>
+    <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : 'Final Save' }}
+    </button>
+  </header>
+
+  <mat-tab-group
+    [selectedIndex]="selectedTabIndex()"
+    (selectedIndexChange)="selectTab($event)"
+    animationDuration="0ms">
+    @for (tab of tabs(); track tab.id) {
+      <mat-tab [label]="tab.label">
+        <div class="tab-content">
+          <section aria-labelledby="document-selector-title">
+            <h2 id="document-selector-title" class="section-title">Applicable documents</h2>
+
+            <mat-radio-group
+              class="document-list"
+              [value]="selectedDocumentId()"
+              (change)="selectDocument($event.value)">
+              @for (document of tab.documents; track document.id) {
+                <mat-card
+                  class="document-card"
+                  [class.document-card--selected]="selectedDocumentId() === document.id">
+                  <mat-radio-button [value]="document.id">
+                    {{ document.label }}
+                  </mat-radio-button>
+                  @if (document.required) {
+                    <span class="required">Mandatory</span>
+                  } @else {
+                    <span class="optional">Optional</span>
+                  }
+                </mat-card>
+              }
+            </mat-radio-group>
+          </section>
+
+          @if (selectedDocument(); as document) {
+            <section class="workspace" aria-labelledby="selected-document-title">
+              <div class="workspace__header">
+                <div>
+                  <h2 id="selected-document-title">{{ document.label }}</h2>
+                  <p>Upload one PDF or up to five image files.</p>
+                </div>
+
+                <input
+                  #fileInput
+                  class="visually-hidden"
+                  type="file"
+                  multiple
+                  accept=".pdf,.jpeg,.jpg,.jfif,.png,application/pdf,image/jpeg,image/png"
+                  (change)="filesSelected($event)" />
+
+                <button mat-stroked-button type="button" (click)="fileInput.click()">
+                  Upload file(s)
+                </button>
+              </div>
+
+              <div class="workspace__grid">
+                <section class="panel" aria-labelledby="uploaded-files-title">
+                  <h3 id="uploaded-files-title">Uploaded files</h3>
+
+                  @if (files().length) {
+                    <ul class="file-list">
+                      @for (file of files(); track file.id) {
+                        <li>
+                          <mat-icon aria-hidden="true">{{ file.type === 'pdf' ? 'picture_as_pdf' : 'image' }}</mat-icon>
+                          <span class="file-name">{{ file.name }}</span>
+                          <button
+                            mat-icon-button
+                            type="button"
+                            [attr.aria-label]="'Remove ' + file.name"
+                            (click)="removeFile(file.id)">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <p class="empty-state">No files uploaded.</p>
+                  }
+
+                  <button
+                    mat-flat-button
+                    type="button"
+                    (click)="triggerOcr()"
+                    [disabled]="!files().length || ocrLoading()">
+                    {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
+                  </button>
+                </section>
+
+                <section class="panel preview" aria-labelledby="preview-title">
+                  <h3 id="preview-title">Document preview</h3>
+
+                  @if (previewFile(); as file) {
+                    @if (file.type === 'image') {
+                      <img [src]="file.objectUrl" [alt]="'Preview of ' + file.name" />
+                    } @else {
+                      <iframe [src]="file.objectUrl" [title]="'Preview of ' + file.name"></iframe>
+                    }
+                  } @else {
+                    <p class="empty-state">Upload a file to preview it.</p>
+                  }
+
+                  @if (files().length > 1) {
+                    <div class="preview-selector" aria-label="Select preview file">
+                      @for (file of files(); track file.id) {
+                        <button
+                          mat-button
+                          type="button"
+                          [class.preview-selector__active]="previewFileId() === file.id"
+                          (click)="selectPreview(file.id)">
+                          {{ file.name }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </section>
+              </div>
+            </section>
+
+            @if (ocrResult(); as result) {
+              <section class="ocr-panel" aria-labelledby="ocr-title">
+                <div class="ocr-panel__header">
+                  <div>
+                    <h2 id="ocr-title">OCR response</h2>
+                    <p>OCR response values are read-only. Document ID can be corrected before confirmation.</p>
+                  </div>
+                </div>
+
+                <div class="ocr-fields">
+                  @for (field of result.fields; track field.key) {
+                    <mat-form-field appearance="outline">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <input matInput [value]="field.value" readonly />
+                    </mat-form-field>
+                  }
+                </div>
+
+                <div class="document-id">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Document ID</mat-label>
+                    <input matInput [formControl]="documentIdControl" autocomplete="off" />
+                  </mat-form-field>
+                  <button mat-stroked-button type="button" (click)="confirmDocumentId()">
+                    Confirm
+                  </button>
+                </div>
+              </section>
+            }
+          }
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
+</section>
