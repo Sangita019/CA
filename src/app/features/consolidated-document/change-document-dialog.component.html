@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Change document?</h2>
+
+<mat-dialog-content>
+  <p>
+    Changing <strong>{{ data.currentDocument }}</strong> will purge the uploaded files and OCR response.
+    Do you want to continue?
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button type="button" (click)="confirm()">Continue</button>
+</mat-dialog-actions>
