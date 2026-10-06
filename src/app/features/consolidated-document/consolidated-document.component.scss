@@ -1,0 +1,179 @@
+.screen {
+  padding: 24px;
+}
+
+.screen__header,
+.workspace__header,
+.ocr-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.screen__header {
+  margin-bottom: 20px;
+}
+
+.screen__header h1,
+.section-title,
+.workspace__header h2,
+.panel h3,
+.ocr-panel h2 {
+  margin: 0;
+}
+
+.screen__header p,
+.workspace__header p,
+.ocr-panel p {
+  margin: 6px 0 0;
+}
+
+.tab-content {
+  padding: 24px 0;
+}
+
+.section-title {
+  margin-bottom: 12px;
+}
+
+.document-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.document-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.document-card--selected {
+  border-width: 2px;
+}
+
+.required,
+.optional {
+  font-size: 12px;
+}
+
+.required {
+  font-weight: 600;
+}
+
+.workspace {
+  margin-top: 24px;
+}
+
+.workspace__grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(360px, 1.2fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.panel,
+.ocr-panel {
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant, #ddd);
+  border-radius: 8px;
+}
+
+.file-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 16px 0;
+  list-style: none;
+}
+
+.file-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview {
+  min-height: 360px;
+}
+
+.preview img,
+.preview iframe {
+  display: block;
+  width: 100%;
+  height: 300px;
+  margin-top: 12px;
+  border: 0;
+  object-fit: contain;
+}
+
+.preview-selector {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.preview-selector__active {
+  font-weight: 700;
+}
+
+.ocr-panel {
+  margin-top: 24px;
+}
+
+.ocr-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.document-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.empty-state {
+  margin: 16px 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 800px) {
+  .screen {
+    padding: 16px;
+  }
+
+  .screen__header,
+  .workspace__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .workspace__grid {
+    grid-template-columns: 1fr;
+  }
+}
