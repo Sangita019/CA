@@ -30,6 +30,42 @@ import {
   ChangeDocumentDialogData
 } from './change-document-dialog.component';
 
+const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
+  {
+    id: 'officially-valid-documents',
+    label: 'Officially Valid Documents',
+    documents: [
+      { id: 'passport', label: 'Passport', required: true },
+      { id: 'driving-licence', label: 'Driving Licence', required: true },
+      { id: 'epic-voter-card', label: 'EPIC / Voter Card', required: true },
+      { id: 'nrega-job-card', label: 'NREGA Job Card', required: false },
+      { id: 'aadhaar', label: 'Aadhaar', required: false }
+    ]
+  },
+  {
+    id: 'current-address',
+    label: 'Current Address',
+    documents: [
+      { id: 'address-proof', label: 'Address Proof', required: true }
+    ]
+  },
+  {
+    id: 'pan-form-60',
+    label: 'PAN / Form-60',
+    documents: [
+      { id: 'pan', label: 'PAN', required: true },
+      { id: 'form-60', label: 'Form-60', required: false }
+    ]
+  },
+  {
+    id: 'supporting-documents',
+    label: 'Supporting Documents',
+    documents: [
+      { id: 'supporting-document', label: 'Supporting Document', required: false }
+    ]
+  }
+];
+
 @Component({
   selector: 'ca-consolidated-document',
   standalone: true,
@@ -49,13 +85,13 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConsolidatedDocumentComponent {
-  readonly tabs = input<readonly ConsolidatedDocumentTab[]>([]);
+  readonly tabs = input<readonly ConsolidatedDocumentTab[]>(DEFAULT_TABS);
   readonly saved = output<void>();
   readonly ocrRequested = output<readonly UploadedDocumentFile[]>();
   readonly documentIdConfirmed = output<string>();
 
   readonly selectedTabIndex = signal(0);
-  readonly selectedDocumentId = signal<string | null>(null);
+  readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
   readonly files = signal<readonly UploadedDocumentFile[]>([]);
   readonly previewFileId = signal<string | null>(null);
   readonly ocrResult = signal<OcrResult | null>(null);
