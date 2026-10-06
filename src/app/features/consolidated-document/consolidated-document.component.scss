@@ -64,6 +64,22 @@
   font-weight: 600;
 }
 
+.upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-count {
+  font-size: 12px;
+}
+
+.upload-message {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .workspace {
   margin-top: 24px;
 }
