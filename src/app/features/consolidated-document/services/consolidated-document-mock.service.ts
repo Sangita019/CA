@@ -46,7 +46,7 @@ export class ConsolidatedDocumentMockService {
     return of({
       saved: true,
       savedAt: new Date().toISOString(),
-      referenceId: `MOCK-CA-${Date.now()}`
+      referenceId: `MOCK-CA-${request.documentId.toUpperCase()}-${Date.now()}`
     }).pipe(delay(400));
   }
 
