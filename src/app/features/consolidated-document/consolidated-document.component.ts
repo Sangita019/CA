@@ -29,6 +29,7 @@ import {
   ChangeDocumentDialogComponent,
   ChangeDocumentDialogData
 } from './change-document-dialog.component';
+import { ConsolidatedDocumentMockService } from './services/consolidated-document-mock.service';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -98,11 +99,16 @@ export class ConsolidatedDocumentComponent {
   readonly ocrLoading = signal(false);
   readonly saving = signal(false);
   readonly uploadMessage = signal<string | null>(null);
+  readonly ocrMessage = signal<string | null>(null);
+  readonly saveMessage = signal<string | null>(null);
+  readonly documentIdConfirmationMessage = signal<string | null>(null);
+  readonly confirmedDocumentId = signal<string | null>(null);
 
   readonly documentIdControl = new FormControl('', { nonNullable: true });
 
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly mockService = inject(ConsolidatedDocumentMockService);
 
   readonly selectedDocument = computed<ConsolidatedDocumentOption | null>(() => {
     const tab = this.tabs()[this.selectedTabIndex()];
@@ -206,6 +212,10 @@ export class ConsolidatedDocumentComponent {
     this.files.set([...currentFiles, ...uploaded]);
     this.previewFileId.set(this.previewFileId() ?? uploaded[0].id);
     this.ocrResult.set(null);
+    this.confirmedDocumentId.set(null);
+    this.ocrMessage.set(null);
+    this.documentIdConfirmationMessage.set(null);
+    this.saveMessage.set(null);
     this.uploadMessage.set(null);
   }
 
@@ -219,6 +229,9 @@ export class ConsolidatedDocumentComponent {
     this.files.set(remaining);
     this.previewFileId.set(remaining[0]?.id ?? null);
     this.ocrResult.set(null);
+    this.ocrMessage.set(null);
+    this.confirmedDocumentId.set(null);
+    this.documentIdConfirmationMessage.set(null);
   }
 
   selectPreview(fileId: string): void {
@@ -226,12 +239,32 @@ export class ConsolidatedDocumentComponent {
   }
 
   triggerOcr(): void {
-    if (!this.files().length) {
+    const files = this.files();
+    const document = this.selectedDocument();
+
+    if (!files.length || !document || this.ocrLoading()) {
       return;
     }
 
     this.ocrLoading.set(true);
-    this.ocrRequested.emit(this.files());
+    this.ocrMessage.set(null);
+    this.saveMessage.set(null);
+    this.documentIdConfirmationMessage.set(null);
+    this.ocrRequested.emit(files);
+
+    this.mockService
+      .processOcr(document.id, files)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.setOcrResult(result);
+          this.ocrMessage.set('Mock OCR completed. Values below are sample data, not extracted from the file.');
+        },
+        error: () => {
+          this.ocrLoading.set(false);
+          this.ocrMessage.set('OCR processing failed. Please try again.');
+        }
+      });
   }
 
   setOcrResult(result: OcrResult): void {
@@ -241,13 +274,51 @@ export class ConsolidatedDocumentComponent {
   }
 
   confirmDocumentId(): void {
-    this.documentIdConfirmed.emit(this.documentIdControl.value.trim());
+    const documentId = this.documentIdControl.value.trim();
+    if (!documentId) {
+      this.documentIdConfirmationMessage.set('Enter a document ID before confirming.');
+      return;
+    }
+
+    this.confirmedDocumentId.set(documentId);
+    this.documentIdConfirmed.emit(documentId);
+    this.documentIdConfirmationMessage.set('Document ID confirmed for this mock session.');
   }
 
   save(): void {
+    const document = this.selectedDocument();
+    if (!document || !this.files().length) {
+      this.saveMessage.set('Select a document and upload at least one file before saving.');
+      return;
+    }
+
     this.saving.set(true);
-    this.saved.emit();
-    this.saving.set(false);
+    this.saveMessage.set(null);
+
+    this.mockService
+      .save({
+        documentId: document.id,
+        documentLabel: document.label,
+        files: this.files(),
+        ocrResult: this.ocrResult(),
+        confirmedDocumentId: this.confirmedDocumentId()
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.saving.set(false);
+          if (response.saved) {
+            this.saved.emit();
+            this.saveMessage.set(`Mock save completed. Reference: ${response.referenceId}. No data was persisted to a backend.`);
+          } else {
+            this.saveMessage.set('The mock save did not complete. Please try again.');
+          }
+        },
+        error: () => {
+          this.saving.set(false);
+          this.saveMessage.set('Save failed. Please try again.');
+        }
+      });
   }
 
   private isPdf(file: File): boolean {
@@ -266,6 +337,11 @@ export class ConsolidatedDocumentComponent {
     this.ocrResult.set(null);
     this.documentIdControl.reset();
     this.ocrLoading.set(false);
+    this.ocrMessage.set(null);
+    this.saveMessage.set(null);
+    this.confirmedDocumentId.set(null);
+    this.documentIdConfirmationMessage.set(null);
+    this.uploadMessage.set(null);
   }
 
   private revokeUrls(files: readonly UploadedDocumentFile[]): void {
