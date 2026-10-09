@@ -99,6 +99,7 @@ export class ConsolidatedDocumentComponent {
   readonly ocrLoading = signal(false);
   readonly saving = signal(false);
   readonly uploadMessage = signal<string | null>(null);
+  readonly uploadMode = signal<'add' | 'replace'>('add');
   readonly ocrMessage = signal<string | null>(null);
   readonly saveMessage = signal<string | null>(null);
   readonly documentIdConfirmationMessage = signal<string | null>(null);
@@ -158,20 +159,26 @@ export class ConsolidatedDocumentComponent {
     this.resetDocumentState();
   }
 
-  filesSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.addFiles(input.files);
-    input.value = '';
+  chooseFiles(mode: 'add' | 'replace', input: HTMLInputElement): void {
+    this.uploadMode.set(mode);
+    input.click();
   }
 
-  addFiles(fileList: FileList | null): void {
+  filesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.addFiles(input.files, this.uploadMode());
+    input.value = '';
+    this.uploadMode.set('add');
+  }
+
+  addFiles(fileList: FileList | null, mode: 'add' | 'replace' = 'add'): void {
     if (!fileList?.length) {
       return;
     }
 
     const selectedFiles = Array.from(fileList);
-    const currentFiles = this.files();
-    const hasPdf = currentFiles.some((file) => file.type === 'pdf');
+    const previousFiles = this.files();
+    const currentFiles = mode === 'replace' ? [] : previousFiles;
     const selectedPdfs = selectedFiles.filter((file) => this.isPdf(file));
     const selectedImages = selectedFiles.filter((file) => this.isImage(file));
     const invalidCount = selectedFiles.length - selectedPdfs.length - selectedImages.length;
@@ -181,6 +188,7 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
+    const hasPdf = currentFiles.some((file) => file.type === 'pdf');
     if (hasPdf || selectedPdfs.length > 0) {
       if (currentFiles.length > 0 || selectedPdfs.length !== 1 || selectedImages.length > 0) {
         this.uploadMessage.set('Upload either one PDF or up to five image files.');
@@ -193,24 +201,31 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
-    const existingKeys = new Set(currentFiles.map((file) => `${file.name}-${file.size}`));
-    const uploaded = selectedFiles
-      .filter((file) => !existingKeys.has(`${file.name}-${file.size}`))
-      .map((file, index) => ({
-        id: `${file.name}-${file.size}-${file.lastModified}-${index}`,
-        name: file.name,
-        type: this.isPdf(file) ? 'pdf' as const : 'image' as const,
-        size: file.size,
-        objectUrl: URL.createObjectURL(file)
-      }));
+    const existingKeys = new Set(currentFiles.map((file) => `${file.name}-${file.size}-${file.lastModified}`));
+    const newFiles = selectedFiles.filter((file) =>
+      !existingKeys.has(`${file.name}-${file.size}-${file.lastModified}`)
+    );
 
-    if (!uploaded.length) {
-      this.uploadMessage.set('The selected file is already uploaded.');
+    if (!newFiles.length) {
+      this.uploadMessage.set('The selected file is already in the uploaded list.');
       return;
     }
 
-    this.files.set([...currentFiles, ...uploaded]);
-    this.previewFileId.set(this.previewFileId() ?? uploaded[0].id);
+    const uploaded = newFiles.map((file, index) => ({
+      id: `${file.name}-${file.size}-${file.lastModified}-${Date.now()}-${index}`,
+      name: file.name,
+      type: this.isPdf(file) ? 'pdf' as const : 'image' as const,
+      size: file.size,
+      objectUrl: URL.createObjectURL(file)
+    }));
+
+    if (mode === 'replace') {
+      this.revokeUrls(previousFiles);
+    }
+
+    const nextFiles = [...currentFiles, ...uploaded];
+    this.files.set(nextFiles);
+    this.previewFileId.set(uploaded[0]?.id ?? this.previewFileId());
     this.ocrResult.set(null);
     this.confirmedDocumentId.set(null);
     this.ocrMessage.set(null);
