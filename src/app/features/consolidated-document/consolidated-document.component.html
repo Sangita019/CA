@@ -4,9 +4,14 @@
       <h1 id="consolidated-document-title">Consolidated Document</h1>
       <p>Select the applicable document, upload files and trigger OCR.</p>
     </div>
-    <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
-      {{ saving() ? 'Saving…' : 'Final Save' }}
-    </button>
+    <div class="save-actions">
+      <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : 'Final Save' }}
+      </button>
+      @if (saveMessage(); as message) {
+        <p class="status-message" role="status">{{ message }}</p>
+      }
+    </div>
   </header>
 
   <mat-tab-group
@@ -100,6 +105,9 @@
                     [disabled]="!files().length || ocrLoading()">
                     {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
                   </button>
+                  @if (ocrMessage(); as message) {
+                    <p class="status-message" role="status">{{ message }}</p>
+                  }
                 </section>
 
                 <section class="panel preview" aria-labelledby="preview-title">
@@ -159,6 +167,9 @@
                     Confirm
                   </button>
                 </div>
+                @if (documentIdConfirmationMessage(); as message) {
+                  <p class="status-message" role="status">{{ message }}</p>
+                }
               </section>
             }
           }
