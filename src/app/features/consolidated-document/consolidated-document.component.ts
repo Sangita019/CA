@@ -122,10 +122,15 @@ export class ConsolidatedDocumentComponent {
   });
 
   selectTab(index: number): void {
-    this.selectedTabIndex.set(index);
-    const firstDocument = this.tabs()[index]?.documents[0];
-    this.selectedDocumentId.set(firstDocument?.id ?? null);
-    this.resetDocumentState();
+    if (index === this.selectedTabIndex()) {
+      return;
+    }
+
+    const nextDocumentId = this.tabs()[index]?.documents[0]?.id ?? null;
+    this.changeSelectionWithConfirmation(() => {
+      this.selectedTabIndex.set(index);
+      this.selectedDocumentId.set(nextDocumentId);
+    });
   }
 
   selectDocument(documentId: string): void {
@@ -133,30 +138,34 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
-    if (this.files().length) {
-      const dialogData: ChangeDocumentDialogData = {
-        currentDocument: this.selectedDocument()?.label ?? 'selected document'
-      };
+    this.changeSelectionWithConfirmation(() => this.selectedDocumentId.set(documentId));
+  }
 
-      this.dialog
-        .open(ChangeDocumentDialogComponent, {
-          width: '420px',
-          data: dialogData,
-          disableClose: true
-        })
-        .afterClosed()
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((confirmed: boolean | undefined) => {
-          if (confirmed) {
-            this.selectedDocumentId.set(documentId);
-            this.resetDocumentState();
-          }
-        });
+  private changeSelectionWithConfirmation(changeSelection: () => void): void {
+    if (!this.files().length) {
+      changeSelection();
+      this.resetDocumentState();
       return;
     }
 
-    this.selectedDocumentId.set(documentId);
-    this.resetDocumentState();
+    const dialogData: ChangeDocumentDialogData = {
+      currentDocument: this.selectedDocument()?.label ?? 'selected document'
+    };
+
+    this.dialog
+      .open(ChangeDocumentDialogComponent, {
+        width: '420px',
+        data: dialogData,
+        disableClose: true
+      })
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmed: boolean | undefined) => {
+        if (confirmed) {
+          changeSelection();
+          this.resetDocumentState();
+        }
+      });
   }
 
   chooseFiles(mode: 'add' | 'replace', input: HTMLInputElement): void {
