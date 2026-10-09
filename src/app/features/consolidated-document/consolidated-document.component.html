@@ -62,10 +62,13 @@
                   (change)="filesSelected($event)" />
 
                 <div class="upload-actions">
-                  <button mat-stroked-button type="button" (click)="fileInput.click()">
-                    Upload file(s)
+                  <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
+                    Add files
                   </button>
                   @if (files().length) {
+                    <button mat-stroked-button type="button" (click)="chooseFiles('replace', fileInput)">
+                      Change files
+                    </button>
                     <span class="upload-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
                   }
                 </div>
