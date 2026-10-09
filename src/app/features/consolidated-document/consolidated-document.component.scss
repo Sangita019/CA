@@ -15,6 +15,24 @@
   margin-bottom: 20px;
 }
 
+.save-actions {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 360px;
+}
+
+.status-message {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ocr-panel .status-message {
+  margin-top: 12px;
+}
+
 .screen__header h1,
 .section-title,
 .workspace__header h2,
