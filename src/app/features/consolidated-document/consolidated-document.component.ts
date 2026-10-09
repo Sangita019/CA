@@ -17,7 +17,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
-import { MatTabsModule } from '@angular/material/tabs';
 
 import {
   ConsolidatedDocumentOption,
@@ -78,7 +77,6 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatIconModule,
     MatInputModule,
     MatRadioModule,
-    MatTabsModule,
     ReactiveFormsModule
   ],
   templateUrl: './consolidated-document.component.html',
