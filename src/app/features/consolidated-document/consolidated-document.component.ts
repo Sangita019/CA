@@ -201,9 +201,9 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
-    const existingKeys = new Set(currentFiles.map((file) => `${file.name}-${file.size}-${file.lastModified}`));
+    const existingKeys = new Set(currentFiles.map((file) => `${file.name}-${file.size}`));
     const newFiles = selectedFiles.filter((file) =>
-      !existingKeys.has(`${file.name}-${file.size}-${file.lastModified}`)
+      !existingKeys.has(`${file.name}-${file.size}`)
     );
 
     if (!newFiles.length) {
