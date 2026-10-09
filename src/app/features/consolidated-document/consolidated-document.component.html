@@ -14,13 +14,26 @@
     </div>
   </header>
 
-  <mat-tab-group
-    [selectedIndex]="selectedTabIndex()"
-    (selectedIndexChange)="selectTab($event)"
-    animationDuration="0ms">
-    @for (tab of tabs(); track tab.id) {
-      <mat-tab [label]="tab.label">
-        <div class="tab-content">
+  <div class="document-layout">
+    <nav class="tab-sidebar" aria-label="Document categories" role="tablist" aria-orientation="vertical">
+      @for (tab of tabs(); track tab.id; let index = $index) {
+        <button
+          class="tab-sidebar__item"
+          type="button"
+          role="tab"
+          [attr.aria-selected]="selectedTabIndex() === index"
+          [attr.aria-controls]="'document-tab-panel-' + tab.id"
+          [class.tab-sidebar__item--active]="selectedTabIndex() === index"
+          (click)="selectTab(index)">
+          <span>{{ tab.label }}</span>
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        </button>
+      }
+    </nav>
+
+    <main class="tab-main">
+      @if (tabs()[selectedTabIndex()]; as tab) {
+        <div class="tab-content" role="tabpanel" [id]="'document-tab-panel-' + tab.id">
           <section aria-labelledby="document-selector-title">
             <h2 id="document-selector-title" class="section-title">Applicable documents</h2>
 
@@ -177,7 +190,7 @@
             }
           }
         </div>
-      </mat-tab>
-    }
-  </mat-tab-group>
+      }
+    </main>
+  </div>
 </section>
