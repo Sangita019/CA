@@ -10,57 +10,19 @@
   </header>
 
   <div class="document-layout">
-    <nav class="tab-sidebar" aria-label="Document categories" role="tablist" aria-orientation="vertical">
-      @for (tab of tabs(); track tab.id; let index = $index) {
-        <button
-          class="tab-sidebar__item"
-          type="button"
-          role="tab"
-          [attr.aria-selected]="selectedTabIndex() === index"
-          [attr.aria-controls]="'document-tab-panel-' + tab.id"
-          [class.tab-sidebar__item--active]="selectedTabIndex() === index"
-          (click)="selectTab(index)">
-          <span>{{ tab.label }}</span>
-          <mat-icon aria-hidden="true">chevron_right</mat-icon>
-        </button>
-      }
-    </nav>
+    <ca-document-category-tabs
+      [tabs]="tabs()"
+      [selectedIndex]="selectedTabIndex()"
+      (tabSelected)="selectTab($event)" />
 
     <main class="tab-main">
       @if (tabs()[selectedTabIndex()]; as tab) {
         <div class="tab-content" role="tabpanel" [id]="'document-tab-panel-' + tab.id">
-          <section aria-labelledby="document-selector-title">
-            <h2 id="document-selector-title" class="section-title">Applicable documents</h2>
-
-            <mat-radio-group
-              class="document-list"
-              [value]="selectedDocumentId()"
-              (change)="selectDocument($event.value)">
-              @for (document of tab.documents; track document.id) {
-                <mat-card
-                  class="document-card"
-                  [class.document-card--selected]="selectedDocumentId() === document.id">
-                  <mat-radio-button
-                    [value]="document.id"
-                    [disabled]="documentStore.isUnavailableInTab(document, tab.id)">
-                    {{ document.label }}
-                  </mat-radio-button>
-                  @if (documentStore.isUnavailableInTab(document, tab.id)) {
-                    <span class="optional">Already uploaded</span>
-                  } @else if (document.required) {
-                    <span class="required">Mandatory</span>
-                  } @else {
-                    <span class="optional">Optional</span>
-                  }
-                  @if (documentStore.isUnavailableInTab(document, tab.id)) {
-                    <p class="duplicate-message" role="status">
-                      Already uploaded under another document category.
-                    </p>
-                  }
-                </mat-card>
-              }
-            </mat-radio-group>
-          </section>
+          <ca-applicable-document-selector
+            [documents]="tab.documents"
+            [selectedDocumentId]="selectedDocumentId()"
+            [unavailableDocumentIds]="unavailableDocumentIds()"
+            (documentSelected)="selectDocument($event)" />
 
           @if (selectedDocument(); as document) {
             <section class="workspace" aria-labelledby="selected-document-title">
@@ -115,69 +77,20 @@
                   }
                 </section>
 
-                <section class="panel preview" aria-labelledby="preview-title">
-                  <h3 id="preview-title">Document preview</h3>
-
-                  @if (previewFile(); as file) {
-                    @if (file.type === 'image') {
-                      <img [src]="file.objectUrl" [alt]="'Preview of ' + file.name" />
-                    } @else {
-                      <iframe [src]="file.objectUrl" [title]="'Preview of ' + file.name"></iframe>
-                    }
-                  } @else {
-                    <p class="empty-state">Upload a file to preview it.</p>
-                  }
-
-                  @if (files().length > 1) {
-                    <div class="preview-selector" aria-label="Select preview file">
-                      @for (file of files(); track file.id) {
-                        <button
-                          mat-button
-                          type="button"
-                          [class.preview-selector__active]="previewFileId() === file.id"
-                          (click)="selectPreview(file.id)">
-                          {{ file.name }}
-                        </button>
-                      }
-                    </div>
-                  }
-                </section>
+                <ca-document-preview
+                  [files]="files()"
+                  [selectedFileId]="previewFileId()"
+                  (fileSelected)="selectPreview($event)" />
               </div>
             </section>
 
             @if (ocrResult(); as result) {
-              <section class="ocr-panel" aria-labelledby="ocr-title">
-                <div class="ocr-panel__header">
-                  <div>
-                    <h2 id="ocr-title">OCR response</h2>
-                    <p>OCR response values are read-only. Document ID can be corrected before confirmation.</p>
-                  </div>
-                </div>
-
-                <div class="ocr-fields">
-                  @for (field of result.fields; track field.key) {
-                    <mat-form-field appearance="outline">
-                      <mat-label>{{ field.label }}</mat-label>
-                      <input matInput [value]="field.value" readonly />
-                    </mat-form-field>
-                  }
-                </div>
-
-                <div class="document-id">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Document ID</mat-label>
-                    <input matInput [formControl]="documentIdControl" autocomplete="off" />
-                  </mat-form-field>
-                  <button mat-stroked-button type="button" (click)="confirmDocumentId()">
-                    Confirm
-                  </button>
-                </div>
-                @if (documentIdConfirmationMessage(); as message) {
-                  <p class="status-message" role="status">{{ message }}</p>
-                }
-              </section>
+              <ca-ocr-response
+                [result]="result"
+                [documentIdControl]="documentIdControl"
+                [confirmationMessage]="documentIdConfirmationMessage()"
+                (confirmRequested)="confirmDocumentId()" />
             }
-          }
         </div>
       }
     </main>
