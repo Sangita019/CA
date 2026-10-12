@@ -29,6 +29,7 @@ import {
   ChangeDocumentDialogData
 } from './change-document-dialog.component';
 import { ConsolidatedDocumentMockService } from './services/consolidated-document-mock.service';
+import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -108,6 +109,7 @@ export class ConsolidatedDocumentComponent {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly mockService = inject(ConsolidatedDocumentMockService);
+  readonly documentStore = inject(ConsolidatedDocumentStore);
 
   readonly selectedDocument = computed<ConsolidatedDocumentOption | null>(() => {
     const tab = this.tabs()[this.selectedTabIndex()];
@@ -124,10 +126,12 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
-    const nextDocumentId = this.tabs()[index]?.documents[0]?.id ?? null;
+    const nextTab = this.tabs()[index];
+    const nextDocumentId = nextTab?.documents[0]?.id ?? null;
     this.changeSelectionWithConfirmation(() => {
       this.selectedTabIndex.set(index);
       this.selectedDocumentId.set(nextDocumentId);
+      this.documentStore.select(nextTab?.id ?? '', nextDocumentId);
     });
   }
 
@@ -136,7 +140,10 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
-    this.changeSelectionWithConfirmation(() => this.selectedDocumentId.set(documentId));
+    this.changeSelectionWithConfirmation(() => {
+      this.selectedDocumentId.set(documentId);
+      this.documentStore.select(this.tabs()[this.selectedTabIndex()]?.id ?? '', documentId);
+    });
   }
 
   private changeSelectionWithConfirmation(changeSelection: () => void): void {
@@ -233,6 +240,16 @@ export class ConsolidatedDocumentComponent {
     const nextFiles = [...currentFiles, ...uploaded];
     this.files.set(nextFiles);
     this.previewFileId.set(uploaded[0]?.id ?? this.previewFileId());
+    const selectedDocument = this.selectedDocument();
+    const selectedTab = this.tabs()[this.selectedTabIndex()];
+    if (selectedDocument && selectedTab) {
+      this.documentStore.markUploaded({
+        documentId: selectedDocument.id,
+        documentLabel: selectedDocument.label,
+        tabId: selectedTab.id,
+        confirmedDocumentId: null
+      });
+    }
     this.ocrResult.set(null);
     this.confirmedDocumentId.set(null);
     this.ocrMessage.set(null);
@@ -330,6 +347,16 @@ export class ConsolidatedDocumentComponent {
         next: (response) => {
           this.saving.set(false);
           if (response.saved) {
+            const document = this.selectedDocument();
+            const tab = this.tabs()[this.selectedTabIndex()];
+            if (document && tab) {
+              this.documentStore.markSaved(
+                document.id,
+                tab.id,
+                document.label,
+                this.confirmedDocumentId()
+              );
+            }
             this.saved.emit();
             this.saveMessage.set(`Mock save completed. Reference: ${response.referenceId}. No data was persisted to a backend.`);
           } else {
@@ -354,6 +381,11 @@ export class ConsolidatedDocumentComponent {
 
   private resetDocumentState(): void {
     this.revokeUrls(this.files());
+    const document = this.selectedDocument();
+    const tab = this.tabs()[this.selectedTabIndex()];
+    if (document && tab) {
+      this.documentStore.clearDocument(document.id, tab.id);
+    }
     this.files.set([]);
     this.previewFileId.set(null);
     this.ocrResult.set(null);
