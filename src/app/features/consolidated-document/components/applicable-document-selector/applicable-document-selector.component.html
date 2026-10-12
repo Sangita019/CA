@@ -1,0 +1,21 @@
+<section aria-labelledby="document-selector-title">
+  <h2 id="document-selector-title" class="section-title">Applicable documents</h2>
+  <mat-radio-group class="document-list" [value]="selectedDocumentId()"
+    (change)="documentSelected.emit($event.value)">
+    @for (document of documents(); track document.id) {
+      <mat-card class="document-card" [class.document-card--selected]="selectedDocumentId() === document.id">
+        <mat-radio-button [value]="document.id" [disabled]="unavailableDocumentIds().has(document.id)">
+          {{ document.label }}
+        </mat-radio-button>
+        @if (unavailableDocumentIds().has(document.id)) {
+          <span class="optional">Already uploaded</span>
+          <p class="duplicate-message" role="status">Already uploaded under another document category.</p>
+        } @else if (document.required) {
+          <span class="required">Mandatory</span>
+        } @else {
+          <span class="optional">Optional</span>
+        }
+      </mat-card>
+    }
+  </mat-radio-group>
+</section>
