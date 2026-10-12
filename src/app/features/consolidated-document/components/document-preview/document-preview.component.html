@@ -1,0 +1,20 @@
+<section class="panel preview" aria-labelledby="preview-title">
+  <h3 id="preview-title">Document preview</h3>
+  @if (previewFile(); as file) {
+    @if (file.type === 'image') {
+      <img [src]="file.objectUrl" [alt]="'Preview of ' + file.name" />
+    } @else {
+      <iframe [src]="file.objectUrl" [title]="'Preview of ' + file.name"></iframe>
+    }
+  } @else {
+    <p class="empty-state">Upload a file to preview it.</p>
+  }
+  @if (files().length > 1) {
+    <div class="preview-selector" aria-label="Select preview file">
+      @for (file of files(); track file.id) {
+        <button mat-button type="button" [class.preview-selector__active]="previewFile()?.id === file.id"
+          (click)="fileSelected.emit(file.id)">{{ file.name }}</button>
+      }
+    </div>
+  }
+</section>
