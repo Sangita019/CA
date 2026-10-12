@@ -1,0 +1,12 @@
+<nav class="tab-sidebar" aria-label="Document categories" role="tablist" aria-orientation="vertical">
+  @for (tab of tabs(); track tab.id; let index = $index) {
+    <button class="tab-sidebar__item" type="button" role="tab"
+      [attr.aria-selected]="selectedIndex() === index"
+      [attr.aria-controls]="'document-tab-panel-' + tab.id"
+      [class.tab-sidebar__item--active]="selectedIndex() === index"
+      (click)="tabSelected.emit(index)">
+      <span>{{ tab.label }}</span>
+      <mat-icon aria-hidden="true">chevron_right</mat-icon>
+    </button>
+  }
+</nav>
