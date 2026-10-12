@@ -1,0 +1,26 @@
+<section class="ocr-panel" aria-labelledby="ocr-title">
+  <div class="ocr-panel__header">
+    <div>
+      <h2 id="ocr-title">OCR response</h2>
+      <p>OCR response values are read-only. Document ID can be corrected before confirmation.</p>
+    </div>
+  </div>
+  <div class="ocr-fields">
+    @for (field of result().fields; track field.key) {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ field.label }}</mat-label>
+        <input matInput [value]="field.value" readonly />
+      </mat-form-field>
+    }
+  </div>
+  <div class="document-id">
+    <mat-form-field appearance="outline">
+      <mat-label>Document ID</mat-label>
+      <input matInput [formControl]="documentIdControl()" autocomplete="off" />
+    </mat-form-field>
+    <button mat-stroked-button type="button" (click)="confirmRequested.emit()">Confirm</button>
+  </div>
+  @if (confirmationMessage(); as message) {
+    <p class="status-message" role="status">{{ message }}</p>
+  }
+</section>
