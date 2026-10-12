@@ -1,0 +1,15 @@
+<ul class="file-list" aria-label="Uploaded files">
+  @for (file of files(); track file.id) {
+    <li>
+      <mat-icon aria-hidden="true">{{ file.type === 'pdf' ? 'picture_as_pdf' : 'image' }}</mat-icon>
+      <span class="file-name">{{ file.name }}</span>
+      <button
+        mat-icon-button
+        type="button"
+        [attr.aria-label]="'Remove ' + file.name"
+        (click)="removeRequested.emit(file.id)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </li>
+  }
+</ul>
