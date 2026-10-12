@@ -1,0 +1,17 @@
+.ocr-panel {
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant, #ddd);
+  border-radius: 8px;
+}
+.ocr-panel__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.ocr-panel h2, .ocr-panel p { margin: 0; }
+.ocr-panel p { margin-top: 6px; }
+.ocr-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.document-id { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+.status-message { margin-top: 12px !important; font-size: 13px; }
