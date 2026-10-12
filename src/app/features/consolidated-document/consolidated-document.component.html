@@ -40,7 +40,9 @@
                 <mat-card
                   class="document-card"
                   [class.document-card--selected]="selectedDocumentId() === document.id">
-                  <mat-radio-button [value]="document.id">
+                  <mat-radio-button
+                    [value]="document.id"
+                    [disabled]="documentStore.isUnavailableInTab(document, tab.id)">
                     {{ document.label }}
                   </mat-radio-button>
                   @if (documentStore.isUnavailableInTab(document, tab.id)) {
