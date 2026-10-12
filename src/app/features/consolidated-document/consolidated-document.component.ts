@@ -11,12 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatRadioModule } from '@angular/material/radio';
 
 import {
   ConsolidatedDocumentOption,
@@ -31,6 +26,10 @@ import {
 import { ConsolidatedDocumentMockService } from './services/consolidated-document-mock.service';
 import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
 import { UploadedFileListComponent } from './components/uploaded-file-list/uploaded-file-list.component';
+import { DocumentCategoryTabsComponent } from './components/document-category-tabs/document-category-tabs.component';
+import { ApplicableDocumentSelectorComponent } from './components/applicable-document-selector/applicable-document-selector.component';
+import { DocumentPreviewComponent } from './components/document-preview/document-preview.component';
+import { OcrResponseComponent } from './components/ocr-response/ocr-response.component';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -73,14 +72,13 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   standalone: true,
   imports: [
     MatButtonModule,
-    MatCardModule,
     MatDialogModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatRadioModule,
     ReactiveFormsModule,
-    UploadedFileListComponent
+    UploadedFileListComponent,
+    DocumentCategoryTabsComponent,
+    ApplicableDocumentSelectorComponent,
+    DocumentPreviewComponent,
+    OcrResponseComponent
   ],
   templateUrl: './consolidated-document.component.html',
   styleUrl: './consolidated-document.component.scss',
@@ -118,9 +116,11 @@ export class ConsolidatedDocumentComponent {
     return tab?.documents.find((document) => document.id === this.selectedDocumentId()) ?? null;
   });
 
-  readonly previewFile = computed(() => {
-    const id = this.previewFileId();
-    return this.files().find((file) => file.id === id) ?? this.files()[0] ?? null;
+  readonly unavailableDocumentIds = computed<ReadonlySet<string>>(() => {
+    const tab = this.tabs()[this.selectedTabIndex()];
+    return new Set((tab?.documents ?? [])
+      .filter((document) => tab && this.documentStore.isUnavailableInTab(document, tab.id))
+      .map((document) => document.id));
   });
 
   selectTab(index: number): void {
@@ -383,11 +383,6 @@ export class ConsolidatedDocumentComponent {
 
   private resetDocumentState(): void {
     this.revokeUrls(this.files());
-    const document = this.selectedDocument();
-    const tab = this.tabs()[this.selectedTabIndex()];
-    if (document && tab) {
-      this.documentStore.clearDocument(document.id, tab.id);
-    }
     this.files.set([]);
     this.previewFileId.set(null);
     this.ocrResult.set(null);
