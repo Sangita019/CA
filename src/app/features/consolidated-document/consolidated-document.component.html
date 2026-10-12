@@ -5,12 +5,7 @@
       <p>Select the applicable document, upload files and trigger OCR.</p>
     </div>
     <div class="save-actions">
-      <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
-        {{ saving() ? 'Saving…' : 'Final Save' }}
-      </button>
-      @if (saveMessage(); as message) {
-        <p class="status-message" role="status">{{ message }}</p>
-      }
+
     </div>
   </header>
 
@@ -48,10 +43,17 @@
                   <mat-radio-button [value]="document.id">
                     {{ document.label }}
                   </mat-radio-button>
-                  @if (document.required) {
+                  @if (documentStore.isUnavailableInTab(document, tab.id)) {
+                    <span class="optional">Already uploaded</span>
+                  } @else if (document.required) {
                     <span class="required">Mandatory</span>
                   } @else {
                     <span class="optional">Optional</span>
+                  }
+                  @if (documentStore.isUnavailableInTab(document, tab.id)) {
+                    <p class="duplicate-message" role="status">
+                      Already uploaded under another document category.
+                    </p>
                   }
                 </mat-card>
               }
@@ -75,16 +77,10 @@
                   (change)="filesSelected($event)" />
 
                 <div class="upload-actions">
-                  <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
-                    Add files
-                  </button>
-                  @if (files().length) {
-                    <button mat-stroked-button type="button" (click)="chooseFiles('replace', fileInput)">
-                      Change files
-                    </button>
-                    <span class="upload-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
-                  }
-                </div>
+                @if (files().length) {
+                  <span class="upload-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
+                }
+              </div>
               </div>
               @if (uploadMessage(); as message) {
                 <p class="upload-message" role="alert">{{ message }}</p>
@@ -114,6 +110,9 @@
                     <p class="empty-state">No files uploaded.</p>
                   }
 
+                  <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
+                    Add files
+                  </button>
                   <button
                     mat-flat-button
                     type="button"
@@ -193,4 +192,15 @@
       }
     </main>
   </div>
+  <footer class="save-footer">
+    @if (documentStore.persistenceWarning(); as warning) {
+      <p class="status-message" role="alert">{{ warning }}</p>
+    }
+    @if (saveMessage(); as message) {
+      <p class="status-message" role="status">{{ message }}</p>
+    }
+    <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
+      {{ saving() ? 'Saving…' : 'Save' }}
+    </button>
+  </footer>
 </section>
