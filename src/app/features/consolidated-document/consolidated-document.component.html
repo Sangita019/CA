@@ -93,21 +93,9 @@
                   <h3 id="uploaded-files-title">Uploaded files</h3>
 
                   @if (files().length) {
-                    <ul class="file-list">
-                      @for (file of files(); track file.id) {
-                        <li>
-                          <mat-icon aria-hidden="true">{{ file.type === 'pdf' ? 'picture_as_pdf' : 'image' }}</mat-icon>
-                          <span class="file-name">{{ file.name }}</span>
-                          <button
-                            mat-icon-button
-                            type="button"
-                            [attr.aria-label]="'Remove ' + file.name"
-                            (click)="removeFile(file.id)">
-                            <mat-icon>delete</mat-icon>
-                          </button>
-                        </li>
-                      }
-                    </ul>
+                    <ca-uploaded-file-list
+                      [files]="files()"
+                      (removeRequested)="removeFile($event)" />
                   } @else {
                     <p class="empty-state">No files uploaded.</p>
                   }
