@@ -1,0 +1,22 @@
+.panel {
+  padding: 16px;
+  border: 1px solid var(--mat-sys-outline-variant, #ddd);
+  border-radius: 8px;
+}
+.preview { min-height: 360px; }
+.preview img, .preview iframe {
+  display: block;
+  width: 100%;
+  height: 300px;
+  margin-top: 12px;
+  border: 0;
+  object-fit: contain;
+}
+.preview-selector {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin-top: 8px;
+}
+.preview-selector__active { font-weight: 700; }
+.empty-state { margin: 16px 0; }
