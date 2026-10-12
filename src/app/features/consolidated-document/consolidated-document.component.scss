@@ -25,6 +25,27 @@
   max-width: 360px;
 }
 
+.save-footer {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 0 8px;
+  border-top: 1px solid var(--mat-sys-outline-variant, #ddd);
+}
+
+.document-card {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.duplicate-message {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--mat-sys-error, #b3261e);
+  font-size: 12px;
+}
+
 .status-message {
   margin: 8px 0 0;
   font-size: 13px;
