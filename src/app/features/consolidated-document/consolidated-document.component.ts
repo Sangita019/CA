@@ -30,6 +30,7 @@ import {
 } from './change-document-dialog.component';
 import { ConsolidatedDocumentMockService } from './services/consolidated-document-mock.service';
 import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
+import { UploadedFileListComponent } from './components/uploaded-file-list/uploaded-file-list.component';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -78,7 +79,8 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatIconModule,
     MatInputModule,
     MatRadioModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    UploadedFileListComponent
   ],
   templateUrl: './consolidated-document.component.html',
   styleUrl: './consolidated-document.component.scss',
