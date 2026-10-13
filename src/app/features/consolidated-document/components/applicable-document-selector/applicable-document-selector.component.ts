@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { MatRadioModule } from '@angular/material/radio';
+import { MatRadioChange, MatRadioGroup, MatRadioModule } from '@angular/material/radio';
 import { ConsolidatedDocumentOption } from '../../models/consolidated-document.models';
 
 @Component({
@@ -16,4 +16,9 @@ export class ApplicableDocumentSelectorComponent {
   readonly selectedDocumentId = input<string | null>(null);
   readonly unavailableDocumentIds = input<ReadonlySet<string>>(new Set<string>());
   readonly documentSelected = output<string>();
+
+  onDocumentChange(documentId: string, group: MatRadioGroup): void {
+    this.documentSelected.emit(documentId);
+    group.value = this.selectedDocumentId();
+  }
 }
