@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { MatRadioChange, MatRadioGroup, MatRadioModule } from '@angular/material/radio';
+import { MatRadioGroup, MatRadioModule } from '@angular/material/radio';
 import { ConsolidatedDocumentOption } from '../../models/consolidated-document.models';
 
 @Component({
