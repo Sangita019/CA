@@ -9,7 +9,7 @@
         </mat-radio-button>
         @if (unavailableDocumentIds().has(document.id)) {
           <span class="optional">Already uploaded</span>
-          <p class="duplicate-message" role="status">Already uploaded under another document category.</p>
+          <p class="duplicate-message" role="status">Already completed in a previous step.</p>
         } @else if (document.required) {
           <span class="required">Mandatory</span>
         } @else {
