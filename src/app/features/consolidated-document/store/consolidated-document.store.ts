@@ -18,7 +18,7 @@ export class ConsolidatedDocumentStore {
   readonly persistenceWarning = signal<string | null>(null);
 
   readonly uploadedDocumentIds = computed(
-    () => new Set(this.records().filter((record) => record.status === 'uploaded' || record.status === 'saved')
+    () => new Set(this.records().filter((record) => record.status === 'saved')
       .map((record) => record.documentId))
   );
 
@@ -26,7 +26,7 @@ export class ConsolidatedDocumentStore {
     return this.records().some((record) =>
       record.documentId === option.id &&
       record.tabId !== tabId &&
-      (record.status === 'uploaded' || record.status === 'saved')
+      record.status === 'saved'
     );
   }
 
