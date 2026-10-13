@@ -275,19 +275,59 @@ export class ConsolidatedDocumentComponent {
     this.uploadMessage.set(null);
   }
 
-  removeFile(fileId: string): void {
-    const file = this.files().find((item) => item.id === fileId);
-    if (file) {
-      URL.revokeObjectURL(file.objectUrl);
+  async removeFile(fileId: string): Promise<void> {
+    const currentFiles = this.files();
+    const file = currentFiles.find((item) => item.id === fileId);
+    if (!file) {
+      return;
     }
 
-    const remaining = this.files().filter((item) => item.id !== fileId);
+    const remaining = currentFiles.filter((item) => item.id !== fileId);
+    const document = this.selectedDocument();
+    const tab = this.tabs()[this.selectedTabIndex()];
+    const wasSaved = Boolean(document && tab && this.documentStore.records().some((record) =>
+      record.documentId === document.id && record.tabId === tab.id && record.status === 'saved'
+    ));
+
     this.files.set(remaining);
     this.previewFileId.set(remaining[0]?.id ?? null);
     this.ocrResult.set(null);
     this.ocrMessage.set(null);
     this.confirmedDocumentId.set(null);
     this.documentIdConfirmationMessage.set(null);
+    URL.revokeObjectURL(file.objectUrl);
+
+    if (!document || !tab) {
+      return;
+    }
+
+    try {
+      if (!remaining.length) {
+        await this.fileStorage.deleteBundle(document.id, tab.id);
+        this.documentStore.clearDocument(document.id, tab.id);
+        this.saveMessage.set('The file was deleted from this browser.');
+        return;
+      }
+
+      if (wasSaved) {
+        await this.fileStorage.saveBundle({
+          documentId: document.id,
+          tabId: tab.id,
+          documentLabel: document.label,
+          confirmedDocumentId: this.confirmedDocumentId(),
+          files: remaining.map((item) => ({
+            id: item.id,
+            name: item.name,
+            type: item.type,
+            size: item.size,
+            blob: item.sourceFile
+          }))
+        });
+        this.saveMessage.set('The file was removed from the saved document.');
+      }
+    } catch {
+      this.saveMessage.set('The file was removed from the current view, but browser storage could not be updated.');
+    }
   }
 
   selectPreview(fileId: string): void {
