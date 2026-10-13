@@ -9,7 +9,7 @@ export interface StoredDocumentFile {
   readonly blob: Blob;
 }
 
-interface StoredDocumentBundle {
+export interface StoredDocumentBundle {
   readonly key: string;
   readonly documentId: string;
   readonly tabId: string;
