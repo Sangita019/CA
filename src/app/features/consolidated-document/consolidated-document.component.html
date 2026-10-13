@@ -62,16 +62,18 @@
                     <p class="empty-state">No files uploaded.</p>
                   }
 
-                  <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
-                    Add files
-                  </button>
-                  <button
+                  <div class="file-actions">
+                    <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
+                      Add files
+                    </button>
+                    <button
                     mat-flat-button
                     type="button"
                     (click)="triggerOcr()"
                     [disabled]="!files().length || ocrLoading()">
                     {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
-                  </button>
+                    </button>
+                  </div>
                   @if (ocrMessage(); as message) {
                     <p class="status-message" role="status">{{ message }}</p>
                   }
