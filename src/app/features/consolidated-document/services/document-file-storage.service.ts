@@ -47,6 +47,13 @@ export class DocumentFileStorageService {
     });
   }
 
+  async deleteBundle(documentId: string, tabId: string): Promise<void> {
+    const database = await this.openDatabase();
+    await this.runTransaction(database, 'readwrite', (store) =>
+      store.delete(this.createKey(documentId, tabId))
+    );
+  }
+
   private createKey(documentId: string, tabId: string): string {
     return `${tabId}::${documentId}`;
   }
