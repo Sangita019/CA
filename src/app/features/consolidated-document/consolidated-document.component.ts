@@ -156,14 +156,32 @@ export class ConsolidatedDocumentComponent {
   }
 
   private changeSelectionWithConfirmation(changeSelection: () => void): void {
-    if (!this.files().length) {
+    const currentDocument = this.selectedDocument();
+    const currentTab = this.tabs()[this.selectedTabIndex()];
+    const currentDocumentSaved = Boolean(currentDocument && currentTab &&
+      this.documentStore.records().some((record) =>
+        record.documentId === currentDocument.id &&
+        record.tabId === currentTab.id &&
+        record.status === 'saved'
+      ));
+
+    const proceed = (): void => {
       changeSelection();
       this.resetDocumentState();
+      const nextTab = this.tabs()[this.selectedTabIndex()];
+      const nextDocument = this.selectedDocument();
+      if (nextTab && nextDocument) {
+        void this.restoreDocumentFiles(nextDocument.id, nextTab.id);
+      }
+    };
+
+    if (!this.files().length || currentDocumentSaved) {
+      proceed();
       return;
     }
 
     const dialogData: ChangeDocumentDialogData = {
-      currentDocument: this.selectedDocument()?.label ?? 'selected document'
+      currentDocument: currentDocument?.label ?? 'selected document'
     };
 
     this.dialog
@@ -176,8 +194,7 @@ export class ConsolidatedDocumentComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((confirmed: boolean | undefined) => {
         if (confirmed) {
-          changeSelection();
-          this.resetDocumentState();
+          proceed();
         }
       });
   }
@@ -381,13 +398,15 @@ export class ConsolidatedDocumentComponent {
 
     this.selectedTabIndex.set(resolvedTabIndex);
     this.selectedDocumentId.set(document?.id ?? null);
-    if (!tab || !document) {
-      return;
+    if (tab && document) {
+      await this.restoreDocumentFiles(document.id, tab.id);
     }
+  }
 
+  private async restoreDocumentFiles(documentId: string, tabId: string): Promise<void> {
     try {
-      const bundle = await this.fileStorage.loadBundle(document.id, tab.id);
-      if (!bundle) {
+      const bundle = await this.fileStorage.loadBundle(documentId, tabId);
+      if (!bundle || !bundle.files.length) {
         return;
       }
       const restored = bundle.files.map((file) => {
