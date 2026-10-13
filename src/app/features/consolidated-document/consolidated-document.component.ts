@@ -24,6 +24,7 @@ import {
   ChangeDocumentDialogData
 } from './change-document-dialog.component';
 import { ConsolidatedDocumentMockService } from './services/consolidated-document-mock.service';
+import { DocumentFileStorageService } from './services/document-file-storage.service';
 import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
 import { UploadedFileListComponent } from './components/uploaded-file-list/uploaded-file-list.component';
 import { DocumentCategoryTabsComponent } from './components/document-category-tabs/document-category-tabs.component';
@@ -47,7 +48,8 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     id: 'current-address',
     label: 'Current Address',
     documents: [
-      { id: 'address-proof', label: 'Address Proof', required: true }
+      { id: 'address-proof', label: 'Address Proof', required: true },
+      { id: 'passport', label: 'Passport', required: false }
     ]
   },
   {
@@ -92,7 +94,7 @@ export class ConsolidatedDocumentComponent {
 
   readonly selectedTabIndex = signal(0);
   readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
-  readonly files = signal<readonly UploadedDocumentFile[]>([]);
+  readonly files = signal<readonly (UploadedDocumentFile & { sourceFile: File })[]>([]);
   readonly previewFileId = signal<string | null>(null);
   readonly ocrResult = signal<OcrResult | null>(null);
   readonly ocrLoading = signal(false);
@@ -109,7 +111,12 @@ export class ConsolidatedDocumentComponent {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly mockService = inject(ConsolidatedDocumentMockService);
+  private readonly fileStorage = inject(DocumentFileStorageService);
   readonly documentStore = inject(ConsolidatedDocumentStore);
+
+  constructor() {
+    void this.restoreSavedDocument();
+  }
 
   readonly selectedDocument = computed<ConsolidatedDocumentOption | null>(() => {
     const tab = this.tabs()[this.selectedTabIndex()];
@@ -232,7 +239,8 @@ export class ConsolidatedDocumentComponent {
       name: file.name,
       type: this.isPdf(file) ? 'pdf' as const : 'image' as const,
       size: file.size,
-      objectUrl: URL.createObjectURL(file)
+      objectUrl: URL.createObjectURL(file),
+      sourceFile: file
     }));
 
     if (mode === 'replace') {
@@ -326,50 +334,88 @@ export class ConsolidatedDocumentComponent {
     this.documentIdConfirmationMessage.set('Document ID confirmed for this mock session.');
   }
 
-  save(): void {
+  async save(): Promise<void> {
     const document = this.selectedDocument();
     if (!document || !this.files().length) {
       this.saveMessage.set('Select a document and upload at least one file before saving.');
       return;
     }
 
+    const tab = this.tabs()[this.selectedTabIndex()];
+    if (!tab) {
+      this.saveMessage.set('The selected document category is unavailable.');
+      return;
+    }
+
     this.saving.set(true);
     this.saveMessage.set(null);
 
-    this.mockService
-      .save({
+    try {
+      await this.fileStorage.saveBundle({
         documentId: document.id,
+        tabId: tab.id,
         documentLabel: document.label,
-        files: this.files(),
-        ocrResult: this.ocrResult(),
-        confirmedDocumentId: this.confirmedDocumentId()
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          this.saving.set(false);
-          if (response.saved) {
-            const document = this.selectedDocument();
-            const tab = this.tabs()[this.selectedTabIndex()];
-            if (document && tab) {
-              this.documentStore.markSaved(
-                document.id,
-                tab.id,
-                document.label,
-                this.confirmedDocumentId()
-              );
-            }
-            this.saved.emit();
-            this.saveMessage.set(`Mock save completed. Reference: ${response.referenceId}. No data was persisted to a backend.`);
-          } else {
-            this.saveMessage.set('The mock save did not complete. Please try again.');
-          }
-        },
-        error: () => {
-          this.saving.set(false);
-          this.saveMessage.set('Save failed. Please try again.');
-        }
+        confirmedDocumentId: this.confirmedDocumentId(),
+        files: this.files().map((file) => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          blob: file.sourceFile
+        }))
       });
+
+      this.documentStore.markSaved(
+        document.id,
+        tab.id,
+        document.label,
+        this.confirmedDocumentId()
+      );
+      this.saved.emit();
+      this.saveMessage.set('Saved in this browser. Files will remain available after refresh on this browser and device; they are not sent to a backend.');
+    } catch {
+      this.saveMessage.set('Could not save files in browser storage. Check available storage and try again.');
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  private async restoreSavedDocument(): Promise<void> {
+    const snapshotTabId = this.documentStore.selectedTabId();
+    const tabIndex = this.tabs().findIndex((tab) => tab.id === snapshotTabId);
+    const resolvedTabIndex = tabIndex >= 0 ? tabIndex : 0;
+    const tab = this.tabs()[resolvedTabIndex];
+    const preferredDocumentId = this.documentStore.selectedDocumentId();
+    const document = tab?.documents.find((option) => option.id === preferredDocumentId)
+      ?? tab?.documents[0];
+
+    this.selectedTabIndex.set(resolvedTabIndex);
+    this.selectedDocumentId.set(document?.id ?? null);
+    if (!tab || !document) {
+      return;
+    }
+
+    try {
+      const bundle = await this.fileStorage.loadBundle(document.id, tab.id);
+      if (!bundle) {
+        return;
+      }
+      const restored = bundle.files.map((file) => {
+        const blob = file.blob;
+        return {
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          objectUrl: URL.createObjectURL(blob),
+          sourceFile: new File([blob], file.name, { type: file.type === 'pdf' ? 'application/pdf' : blob.type })
+        };
+      });
+      this.files.set(restored);
+      this.previewFileId.set(restored[0]?.id ?? null);
+    } catch {
+      this.saveMessage.set('Previously saved files could not be loaded from browser storage.');
+    }
   }
 
   private isPdf(file: File): boolean {
