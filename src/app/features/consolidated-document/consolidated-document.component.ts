@@ -250,16 +250,6 @@ export class ConsolidatedDocumentComponent {
     const nextFiles = [...currentFiles, ...uploaded];
     this.files.set(nextFiles);
     this.previewFileId.set(uploaded[0]?.id ?? this.previewFileId());
-    const selectedDocument = this.selectedDocument();
-    const selectedTab = this.tabs()[this.selectedTabIndex()];
-    if (selectedDocument && selectedTab) {
-      this.documentStore.markUploaded({
-        documentId: selectedDocument.id,
-        documentLabel: selectedDocument.label,
-        tabId: selectedTab.id,
-        confirmedDocumentId: null
-      });
-    }
     this.ocrResult.set(null);
     this.confirmedDocumentId.set(null);
     this.ocrMessage.set(null);
