@@ -59,9 +59,12 @@ import { MockOcrImageService } from './mock-ocr-image.service';
 })
 export class ImageEditorComponent implements OnDestroy, OnChanges {
   private _imageEditor?: ElementRef;
-  @ViewChild('imageEditor') set imageEditor(ref: ElementRef) {
+  @ViewChild('imageEditor') set imageEditor(ref: ElementRef | undefined) {
     this._imageEditor = ref;
-    this.updateImageInEditor(this.imageFiles[this.currentSilde]);
+    const file = this.imageFiles[this.currentSilde];
+    if (ref && file) {
+      this.updateImageInEditor(file);
+    }
   }
 
   //for icons
