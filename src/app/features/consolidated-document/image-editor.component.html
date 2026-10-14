@@ -1,0 +1,196 @@
+@if (displayImageOverlay) {
+  <app-image-carousel [carsouselImages]="imageFiles" (hideImageOverlay)="hideImageOverlay()" />
+}
+<div class="sticky-header-img-edit-csp" oncontextmenu="return false">
+
+ <!-- OCR LIST -->
+  <div class="image-editor-layout">
+    <div class="ocr-item-list">
+      <h3>OCR Items</h3>
+
+      @for (group of groupedOcrItems; track group.text) {
+
+        @if (group.items.length === 1) {
+
+          @let item = group.items[0];
+
+          <button
+            type="button"
+            class="ocr-item"
+            [class.selected]="selectedOcrItem?.id === item.id"
+            (click)="selectOcrItem(item)"
+          >
+            <strong>{{ item.label }}</strong>
+            <span>{{ item.text }}</span>
+          </button>
+
+        } @else {
+
+          <div class="ocr-group">
+
+            <div class="ocr-group-header">
+              <span>{{ group.text }}</span>
+              <small>{{ group.items.length }}</small>
+            </div>
+
+            @for (item of group.items; track item.id) {
+
+              <button
+                type="button"
+                class="ocr-item ocr-occurrence"
+                [class.selected]="selectedOcrItem?.id === item.id"
+                (click)="selectOcrItem(item)"
+              >
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.text }}</span>
+              </button>
+
+            }
+
+          </div>
+        }
+      }
+    </div>
+  <div class="editor-with-toolbar-container">
+    <div class="editor-container">
+      <img
+        #imageEditor
+        class="image-editor"
+        [src]="currentImageObj ? 'data:image/jpeg;base64,' + currentImageObj.content : ''"
+        (load)="onImageLoadInEditor()"
+        alt="cropper-img"
+        crossorigin="anonymous"
+      />
+
+    <div class="ocr-overlay">
+
+     @if (selectedOcrItem) {
+
+        @let coordinates = getOcrCoordinates(selectedOcrItem);
+
+      @if (coordinates) {
+          <div
+            class="ocr-box selected"
+            [style.left.px]="coordinates.left"
+            [style.top.px]="coordinates.top"
+            [style.width.px]="coordinates.width"
+            [style.height.px]="coordinates.height"
+          >
+          </div>
+      }
+    }
+    </div>
+      <button class="fullscreen-btn" (click)="showImageOverlay()" title="View in full screen">
+        <fa-icon [icon]="expandIcon" />
+      </button>
+    </div>
+
+    <div class="toolbar">
+      @if (showToolbar) {
+        <!--zoom-->
+        @if (showControls.controls.includes(EditorControl.ZOOM)) {
+          <div class="border border-primary">
+            <button (click)="zoomOut()" title="Zoom Out">
+              <fa-icon [icon]="zoomOutIcon" class="button-icon"></fa-icon>
+            </button>
+            <button (click)="zoomIn()" title="Zoom In">
+              <fa-icon [icon]="zoomInIcon" class="button-icon"></fa-icon>
+            </button>
+          </div>
+        }
+        <div class="border border-primary ms-3">
+          @if (showControls.controls.includes(EditorControl.ROTATE)) {
+            <button (click)="rotateLeft()" title="Rotate Left">
+              <fa-icon [icon]="leftRotateIcon" class="button-icon"></fa-icon>
+            </button>
+            <button (click)="rotateRight()" title="Rotate Right">
+              <fa-icon [icon]="rightRotateIcon" class="button-icon"></fa-icon>
+            </button>
+          }
+          <!--free crop-->
+          @if (showControls.controls.includes(EditorControl.CROP)) {
+            <button (click)="crop()" title="Crop">
+              <fa-icon [icon]="cropImageIcon" class="button-icon" />
+            </button>
+          }
+          <!-- photo crop -->
+          @if (showControls.controls.includes(EditorControl.PHOTOCROP)) {
+            <button (click)="crop(2, 3)" title="Crop 2:3">
+              <fa-icon [icon]="cropImageIcon" class="button-icon" />
+            </button>
+          }
+          <!-- signature crop -->
+          @if (showControls.controls.includes(EditorControl.SIGNCROP)) {
+            <button (click)="crop(4, 1)" title="Crop 4:1">
+              <fa-icon [icon]="cropImageIcon" class="button-icon" />
+            </button>
+          }
+          @if (showControls.isEditable && madeChanges) {
+            <button (click)="applyChanges()" title="Apply">
+              <fa-icon [icon]="checkIcon" class="button-icon"></fa-icon>
+            </button>
+          }
+        </div>
+        <div class="border border-primary ms-3">
+          <!-- compress image -->
+          @if (showControls.controls.includes(EditorControl.COMPRESS)) {
+            <button (click)="compressImage()" title="Compress Image">
+              <fa-icon [icon]="compressIcon" class="button-icon"></fa-icon>
+            </button>
+          }
+        </div>
+        @if (showControls.isEditable) {
+          <button (click)="reset()" title="Reset" class="ms-3 border border-danger">
+            <fa-icon [icon]="cancelIcon" class="button-icon" />
+          </button>
+        }
+      }
+    </div>
+    <div class="d-flex justify-content-between py-2 px-2">
+      <div class="d-flex flex-column">
+        <span class="fs-dot-8">File size: {{ (currentImgFileSize / 1024).toFixed(2) }}KB</span>
+        @if (isStaff) {
+          <span [ngClass]="isKycCompliant ? 'badge bg-success' : 'badge bg-danger'">{{
+            isKycCompliant ? "CKYC Compliant" : "CKYC Non-Compliant. Compress Image"
+          }}</span>
+        }
+      </div>
+      <div>
+        @if (showControls.controls.includes(EditorControl.DELETE)) {
+          <button class="btn btn-danger mx-1 py-1" (click)="deleteImage()">
+            <fa-icon [icon]="deleteIcon" class="button-icon"></fa-icon>
+          </button>
+        }
+        <!-- allow upload if the image is edited or user uploaded new image which is size compliant-->
+        @if (showControls.isEditable && (appliedChanges || (!currentImageObj?.fileId && isKycCompliant))) {
+          <button class="btn btn-primary" (click)="submit()">Upload</button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="carousel-cotnainer">
+    <div class="navigate-arrow">
+      <div class="navigate-arrow" (click)="slideBack()">
+        <fa-icon [icon]="leftArrow" class="button-icon"></fa-icon>
+      </div>
+    </div>
+
+    <div class="d-flex flex-grow-1 carousel">
+      <div class="scroll-horizontal">
+        @for (option of imageFiles; track $index) {
+          <img
+            [src]="'data:image/jpeg;base64,' + option?.content"
+            (click)="setCarouselImg($index)"
+            [class]="$index === currentSilde ? 'carousel-img selectedImg' : 'carousel-img not-selectedImg'"
+            class=""
+            alt="error"
+          />
+        }
+      </div>
+    </div>
+    <div class="navigate-arrow" (click)="slideNext()">
+      <fa-icon [icon]="rightArrow" class="button-icon"></fa-icon>
+    </div>
+  </div>
+</div>
