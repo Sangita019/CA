@@ -13,10 +13,9 @@
         <p class="empty-state" role="status">Preparing image preview…</p>
       }
     } @else {
-      <div class="pdf-preview-fallback">
-        <app-ocr-pdf-viewer-editor [pdfSrc]="file.objectUrl" [loadSampleOcr]="false" />
-        <iframe [src]="safePreviewUrl()" [title]="'PDF preview of ' + file.name"></iframe>
-      </div>
+      <app-ocr-pdf-viewer-editor
+        [pdfSrc]="file.objectUrl"
+        [loadSampleOcr]="false" />
     }
   } @else {
     <p class="empty-state">Upload a file to preview it.</p>
