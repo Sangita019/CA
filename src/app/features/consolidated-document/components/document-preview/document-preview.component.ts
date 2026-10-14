@@ -19,7 +19,7 @@ export class DocumentPreviewComponent {
   readonly fileSelected = output<string>();
   readonly previewFile = computed(() => this.files().find((file) => file.id === this.selectedFileId()) ?? this.files()[0] ?? null);
   readonly imageEditorFiles = signal<Array<{ content: string; fileId: null; localFileId: string }>>([]);
-  readonly imageEditorControls = { controls: [] };
+  readonly imageEditorControls = { controls: [], isEditable: false };
   private conversionVersion = 0;
   private readonly sanitizer = inject(DomSanitizer);
   readonly safePreviewUrl = computed<SafeResourceUrl | null>(() => {
