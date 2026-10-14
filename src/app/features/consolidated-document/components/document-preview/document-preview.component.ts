@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, inject } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { OcrPdfViewerComponent } from '../../ocr-pdf-viewer-editor.component';
 import { ImageEditorComponent } from '../../image-editor.component';
@@ -20,6 +21,11 @@ export class DocumentPreviewComponent {
   readonly imageEditorFiles = signal<Array<{ content: string; fileId: null; localFileId: string }>>([]);
   readonly imageEditorControls = { controls: [] };
   private conversionVersion = 0;
+  private readonly sanitizer = inject(DomSanitizer);
+  readonly safePreviewUrl = computed<SafeResourceUrl | null>(() => {
+    const file = this.previewFile();
+    return file?.type === 'pdf' ? this.sanitizer.bypassSecurityTrustResourceUrl(file.objectUrl) : null;
+  });
 
   constructor() {
     effect(() => {
