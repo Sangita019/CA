@@ -187,8 +187,18 @@ export class ImageEditorComponent implements OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-    this.loadTestImage();
-    this.loadOcr();
+    if (this.useSampleImage) {
+      this.loadTestImage();
+    } else if (this.imageFiles.length > 0) {
+      this.currentSilde = 0;
+      this.updateImageInEditor(this.imageFiles[0]);
+    }
+    if (this.loadSampleOcr) {
+      this.loadOcr();
+    } else {
+      this.currentOcrItems = this.ocrItems;
+      this.groupOcrItems();
+    }
   }
 
   loadOcr(): void {
