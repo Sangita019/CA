@@ -4,7 +4,7 @@
     @if (file.type === 'image') {
       <img [src]="file.objectUrl" [alt]="'Preview of ' + file.name" />
     } @else {
-      <app-ocr-pdf-viewer [pdfSrc]="file.objectUrl" [loadSampleOcr]="false" />
+      <app-ocr-pdf-viewer-editor [pdfSrc]="file.objectUrl" [loadSampleOcr]="false" />
     }
   } @else {
     <p class="empty-state">Upload a file to preview it.</p>
