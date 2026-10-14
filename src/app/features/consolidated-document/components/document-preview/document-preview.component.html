@@ -15,7 +15,7 @@
     } @else {
       <div class="pdf-preview-fallback">
         <app-ocr-pdf-viewer-editor [pdfSrc]="file.objectUrl" [loadSampleOcr]="false" />
-        <iframe [src]="file.objectUrl" [title]="'PDF preview of ' + file.name"></iframe>
+        <iframe [src]="safePreviewUrl()" [title]="'PDF preview of ' + file.name"></iframe>
       </div>
     }
   } @else {
