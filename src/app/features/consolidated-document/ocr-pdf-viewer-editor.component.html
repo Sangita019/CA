@@ -1,0 +1,56 @@
+<div class="ocr-pdf-container">
+  <div class="ocr-item-list">
+    <h3>OCR Items</h3>
+
+    @for (group of groupedOcrItems; track group.text) {
+
+      @if (group.items.length === 1) {
+
+        @let item = group.items[0];
+
+        <button
+          type="button"
+          class="ocr-item"
+          [class.selected]="selectedItem?.id === item.id"
+          (click)="selectOcrItem(item)"
+        >
+          <strong>{{ item.label }}</strong>
+          <span>{{ item.text }}</span>
+        </button>
+
+      } @else {
+
+        <div class="ocr-group">
+          <div class="ocr-group-header">
+            <span>{{ group.text }}</span>
+            <small>{{ group.items.length }}</small>
+          </div>
+
+          @for (item of group.items; track item.id) {
+            <button
+              type="button"
+              class="ocr-item ocr-occurrence"
+              [class.selected]="selectedItem?.id === item.id"
+              (click)="selectOcrItem(item)"
+            >
+              <strong>{{ item.label }}</strong>
+              <span>Page {{ item.pageNumber }}</span>
+            </button>
+          }
+        </div>
+
+      }
+    }
+  </div>
+
+  <div class="pdf-container">
+    <ngx-extended-pdf-viewer
+      #pdfViewer
+      [src]="pdfSrc"
+      [height]="'800px'"
+      [showToolbar]="true"
+      (pageRendered)="onPageRendered($event)"
+    >
+    </ngx-extended-pdf-viewer>
+  </div>
+</div>
