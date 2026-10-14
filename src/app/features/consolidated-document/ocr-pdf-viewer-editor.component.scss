@@ -1,0 +1,134 @@
+.ocr-pdf-container {
+  display: flex;
+  width: 100%;
+  height: 850px;
+  overflow: hidden;
+}
+
+.ocr-item-list {
+  width: 260px;
+  flex-shrink: 0;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+.ocr-item-list h3 {
+  margin: 4px 4px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ocr-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  width: 100%;
+  min-height: 38px;
+  margin-bottom: 5px;
+  padding: 7px 9px;
+
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 5px;
+
+  background: #fff;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.ocr-item:hover {
+  background: #f0f6ff;
+  border-color: #bfdbfe;
+}
+
+.ocr-item.selected {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+.ocr-item strong {
+  flex-shrink: 0;
+
+  padding: 2px 5px;
+  border-radius: 3px;
+
+  background: #e5e7eb;
+  color: #374151;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.ocr-item.selected strong {
+  background: #2563eb;
+  color: white;
+}
+
+.ocr-item span {
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #374151;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pdf-container {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ocr-highlight {
+  position: absolute;
+  border: 3px solid #2196f3;
+  background-color: rgba(33, 150, 243, 0.2);
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.ocr-group {
+  margin-bottom: 8px;
+}
+
+.ocr-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 6px 8px;
+
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 5px 5px 0 0;
+
+  color: #374151;
+}
+
+.ocr-group-header strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ocr-group-header span {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.ocr-item-occurrence {
+  margin-bottom: 2px;
+  border-radius: 3px;
+  padding-left: 18px;
+  background: #fff;
+}
