@@ -1,0 +1,17 @@
+<div class="image-carousel-div-style">
+  <div id="overlay">
+    <ngb-carousel [interval]="0" class="ngb-container">
+      @for (img of carsouselImages; track $index) {
+        <ng-template ngbSlide>
+          <div class="picsum-img-wrapper carsousel-container">
+            <img [src]="'data:image/jpeg;base64,' + img.content" class="carousel-image" />
+          </div>
+        </ng-template>
+      }
+    </ngb-carousel>
+
+    <button mat-fab color="warn" class="close-button-style mx-2 mt-1" (click)="close()" title="Close">
+      <fa-icon [icon]="closeIcon" />
+    </button>
+  </div>
+</div>
