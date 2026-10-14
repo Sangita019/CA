@@ -2,7 +2,16 @@
   <h3 id="preview-title">Document preview</h3>
   @if (previewFile(); as file) {
     @if (file.type === 'image') {
-      <img [src]="file.objectUrl" [alt]="'Preview of ' + file.name" />
+      @if (imageEditorFiles().length) {
+        <app-image-editor
+          [imageFiles]="imageEditorFiles()"
+          [showControls]="imageEditorControls"
+          [maxCompressSizeInMb]="5"
+          [useSampleImage]="false"
+          [loadSampleOcr]="false" />
+      } @else {
+        <p class="empty-state" role="status">Preparing image preview…</p>
+      }
     } @else {
       <app-ocr-pdf-viewer-editor [pdfSrc]="file.objectUrl" [loadSampleOcr]="false" />
     }
