@@ -1,4 +1,4 @@
-import { OnInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { OnInit, ChangeDetectorRef, Component, ElementRef, ViewChild, Input } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
