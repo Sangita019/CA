@@ -86,6 +86,10 @@ export class ImageEditorComponent implements OnDestroy, OnChanges {
   private cropper: Cropper | null = null;
   // for props
   @Input() imageFiles: IDocFile[] = [];
+  /** Set false when the editor is bound to user-uploaded files. */
+  @Input() useSampleImage = true;
+  /** Set false when OCR data is supplied by the parent feature. */
+  @Input() loadSampleOcr = true;
   @Input() showControls!: IEditorControlManager;
   @Output() imageAction: EventEmitter<IImageAction> = new EventEmitter<IImageAction>();
   @Input() maxCompressSizeInMb!: number;
