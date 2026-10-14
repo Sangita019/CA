@@ -21,7 +21,9 @@ export class OcrPdfViewerComponent implements OnInit {
 
   private readonly destroy$ = new Subject<void>();
 
-  pdfSrc = '/assets/pdf/sample-document.pdf';
+  @Input() pdfSrc = '/assets/pdf/sample-document.pdf';
+  /** Disable sample OCR when displaying a user-uploaded PDF. */
+  @Input() loadSampleOcr = true;
 
   ocrDocument?: OcrDocument;
 
