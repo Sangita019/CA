@@ -271,7 +271,10 @@ export class ImageEditorComponent implements OnDestroy, OnChanges {
     }
   }
 
-  updateImageInEditor(file: IDocFile) {
+  updateImageInEditor(file: IDocFile | undefined) {
+    if (!file) {
+      return;
+    }
     this.appliedChanges = false;
     this.madeChanges = false;
     if (file.localFileId === this.currentImageObj?.localFileId && file.content === this.currentImageObj.content) {
