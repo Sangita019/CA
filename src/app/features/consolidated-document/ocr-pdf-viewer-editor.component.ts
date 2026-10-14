@@ -44,7 +44,12 @@ export class OcrPdfViewerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadOcr();
+    if (this.loadSampleOcr) {
+      this.loadOcr();
+    } else {
+      this.isLoading = false;
+      this.ocrDocument = undefined;
+    }
   }
 
   loadOcr(): void {
