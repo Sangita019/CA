@@ -47,7 +47,7 @@
     <ngx-extended-pdf-viewer
       #pdfViewer
       [src]="pdfSrc"
-      [height]="'800px'"
+      [height]="'min(800px, 65vh)'"
       [showToolbar]="true"
       (pageRendered)="onPageRendered($event)"
     >
