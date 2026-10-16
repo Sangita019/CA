@@ -16,6 +16,8 @@
 .document-card--selected { border-width: 2px; }
 .required, .optional { font-size: 12px; }
 .required { font-weight: 600; }
+mat-chip-set { display: inline-flex; max-width: 100%; }
+mat-chip { --mdc-chip-container-height: 28px; font-size: 12px; }
 .duplicate-message {
   flex-basis: 100%;
   margin: 0;
