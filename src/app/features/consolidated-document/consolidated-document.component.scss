@@ -134,6 +134,14 @@
 }
 
 @media (max-width: 800px) {
+  .screen__header { gap: 12px; }
+  .save-footer { align-items: stretch; }
+  .save-footer button { width: 100%; }
+  .workspace { margin-top: 16px; }
+  .workspace__grid { gap: 12px; }
+  .panel, .ocr-panel { padding: 12px; }
+  .upload-actions { flex-wrap: wrap; max-width: 100%; }
+
   .screen {
     padding: 16px;
   }
