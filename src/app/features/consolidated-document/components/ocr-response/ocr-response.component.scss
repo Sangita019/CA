@@ -15,3 +15,10 @@
 }
 .document-id { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
 .status-message { margin-top: 12px !important; font-size: 13px; }
+@media (max-width: 600px) {
+  .ocr-panel { padding: 12px; }
+  .ocr-panel__header { align-items: flex-start; flex-direction: column; }
+  .ocr-fields { grid-template-columns: minmax(0, 1fr); }
+  .document-id { align-items: stretch; flex-direction: column; gap: 4px; }
+  .document-id mat-form-field, .document-id button { width: 100%; }
+}
