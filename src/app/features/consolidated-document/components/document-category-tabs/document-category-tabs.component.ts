@@ -7,7 +7,7 @@ import { ConsolidatedDocumentTab } from '../../models/consolidated-document.mode
 @Component({
   selector: 'ca-document-category-tabs',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, MatListModule, MatChipsModule],
   templateUrl: './document-category-tabs.component.html',
   styleUrl: './document-category-tabs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
