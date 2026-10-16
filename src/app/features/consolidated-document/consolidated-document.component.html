@@ -42,7 +42,9 @@
 
                 <div class="upload-actions">
                 @if (files().length) {
-                  <span class="upload-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
+                  <mat-chip-set aria-label="Selected file count">
+                    <mat-chip>{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</mat-chip>
+                  </mat-chip-set>
                 }
               </div>
               </div>
