@@ -7,7 +7,7 @@ import { ConsolidatedDocumentOption } from '../../models/consolidated-document.m
 @Component({
   selector: 'ca-applicable-document-selector',
   standalone: true,
-  imports: [MatCardModule, MatRadioModule],
+  imports: [MatCardModule, MatRadioModule, MatChipsModule],
   templateUrl: './applicable-document-selector.component.html',
   styleUrl: './applicable-document-selector.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
