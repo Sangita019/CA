@@ -1,22 +1,35 @@
 .tab-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: block;
+  min-width: 0;
+  padding: 0;
 }
-.tab-sidebar__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  padding: 14px 12px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
+.tab-sidebar button[mat-list-item] {
+  min-height: 52px;
+  height: auto;
+  border-radius: 8px;
   text-align: left;
-  cursor: pointer;
 }
 .tab-sidebar__item--active {
   background: var(--mat-sys-secondary-container, #e8def8);
   font-weight: 600;
+}
+mat-chip-set {
+  margin-left: 8px;
+}
+mat-chip {
+  --mdc-chip-container-height: 26px;
+  font-size: 11px;
+}
+@media (max-width: 800px) {
+  .tab-sidebar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 10px;
+  }
+  .tab-sidebar button[mat-list-item] {
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: 230px;
+  }
 }
