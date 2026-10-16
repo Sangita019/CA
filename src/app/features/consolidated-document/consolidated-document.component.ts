@@ -188,7 +188,7 @@ export class ConsolidatedDocumentComponent {
 
     this.dialog
       .open(ChangeDocumentDialogComponent, {
-        width: '420px',
+        width: 'min(420px, calc(100vw - 32px))',
         data: dialogData,
         disableClose: true
       })
