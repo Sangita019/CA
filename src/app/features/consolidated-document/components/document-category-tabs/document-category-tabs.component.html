@@ -1,12 +1,18 @@
-<nav class="tab-sidebar" aria-label="Document categories" role="tablist" aria-orientation="vertical">
+<mat-nav-list class="tab-sidebar" aria-label="Document categories" role="tablist">
   @for (tab of tabs(); track tab.id; let index = $index) {
-    <button class="tab-sidebar__item" type="button" role="tab"
+    <button mat-list-item type="button" role="tab"
       [attr.aria-selected]="selectedIndex() === index"
       [attr.aria-controls]="'document-tab-panel-' + tab.id"
       [class.tab-sidebar__item--active]="selectedIndex() === index"
       (click)="tabSelected.emit(index)">
-      <span>{{ tab.label }}</span>
-      <mat-icon aria-hidden="true">chevron_right</mat-icon>
+      <span matListItemTitle>{{ tab.label }}</span>
+      @if (selectedIndex() === index) {
+        <mat-chip-set matListItemMeta aria-label="Current category">
+          <mat-chip>Selected</mat-chip>
+        </mat-chip-set>
+      } @else {
+        <mat-icon matListItemMeta aria-hidden="true">chevron_right</mat-icon>
+      }
     </button>
   }
-</nav>
+</mat-nav-list>
