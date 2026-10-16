@@ -76,6 +76,7 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   imports: [
     MatButtonModule,
     MatDialogModule,
+    MatChipsModule,
     ReactiveFormsModule,
     UploadedFileListComponent,
     DocumentCategoryTabsComponent,
