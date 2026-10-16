@@ -13,6 +13,8 @@
   gap: 8px;
 }
 
+.file-list li { min-width: 0; }
+.file-name { overflow-wrap: anywhere; }
 .file-name {
   flex: 1;
   overflow: hidden;
