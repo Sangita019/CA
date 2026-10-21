@@ -67,14 +67,10 @@
           </div>
 
           @if (files().length) {
-            <div class="file-preview-layout">
-              <section class="uploaded-files" aria-labelledby="uploaded-files-title">
-                <h3 id="uploaded-files-title">Uploaded files</h3>
-                <ca-uploaded-file-list [files]="files()" (removeRequested)="removeFile($event)" />
-              </section>
-              <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
-                (fileSelected)="selectPreview($event)" />
-            </div>
+            <section class="uploaded-files" aria-labelledby="uploaded-files-title">
+              <h3 id="uploaded-files-title">Uploaded files</h3>
+              <ca-uploaded-file-list [files]="files()" (removeRequested)="removeFile($event)" />
+            </section>
           } @else {
             <div class="drop-hint">
               <span class="upload-icon" aria-hidden="true">↑</span>
@@ -89,9 +85,16 @@
         </section>
 
         @if (ocrResult(); as result) {
-          <ca-ocr-response [result]="result" [documentIdControl]="documentIdControl"
-            [confirmationMessage]="documentIdConfirmationMessage()"
-            (confirmRequested)="confirmDocumentId()" />
+          <div class="analysis-layout">
+            <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
+              (fileSelected)="selectPreview($event)" />
+            <ca-ocr-response [result]="result" [documentIdControl]="documentIdControl"
+              [confirmationMessage]="documentIdConfirmationMessage()"
+              (confirmRequested)="confirmDocumentId()" />
+          </div>
+        } @else if (files().length) {
+          <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
+            (fileSelected)="selectPreview($event)" />
         }
       }
     </section>
