@@ -2,22 +2,30 @@
   <header class="screen__header">
     <div>
       <h1 id="consolidated-document-title">Consolidated Document</h1>
-      <p>Select the applicable document, upload files and trigger OCR.</p>
+      <p>Select a category, choose the applicable document, upload files and trigger OCR.</p>
     </div>
-    <div class="save-actions">
-
-    </div>
+    <mat-chip-set aria-label="Document workflow">
+      <mat-chip>3 categories</mat-chip>
+    </mat-chip-set>
   </header>
 
-  <div class="document-layout">
-    <ca-document-category-tabs
-      [tabs]="tabs()"
-      [selectedIndex]="selectedTabIndex()"
-      (tabSelected)="selectTab($event)" />
+  <mat-accordion class="category-accordion" [multi]="false">
+    @for (tab of tabs(); track tab.id; let index = $index) {
+      <mat-expansion-panel
+        [expanded]="selectedTabIndex() === index"
+        (opened)="selectTab(index)"
+        [attr.aria-label]="tab.label">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ tab.label }}</mat-panel-title>
+          <mat-panel-description>
+            <span class="category-document">{{ categoryDocumentLabel(tab) }}</span>
+            <mat-chip-set aria-label="Category status">
+              <mat-chip [color]="categoryStatusColor(tab, index)">{{ categoryStatus(tab, index) }}</mat-chip>
+            </mat-chip-set>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
 
-    <main class="tab-main">
-      @if (tabs()[selectedTabIndex()]; as tab) {
-        <div class="tab-content" role="tabpanel" [id]="'document-tab-panel-' + tab.id">
+        <div class="tab-content" role="region" [attr.aria-label]="tab.label + ' documents'">
           <ca-applicable-document-selector
             [documents]="tab.documents"
             [selectedDocumentId]="selectedDocumentId()"
@@ -31,7 +39,6 @@
                   <h2 id="selected-document-title">{{ document.label }}</h2>
                   <p>Upload one PDF or up to five image files.</p>
                 </div>
-
                 <input
                   #fileInput
                   class="visually-hidden"
@@ -39,15 +46,13 @@
                   multiple
                   accept=".pdf,.jpeg,.jpg,.jfif,.png,application/pdf,image/jpeg,image/png"
                   (change)="filesSelected($event)" />
-
-                <div class="upload-actions">
                 @if (files().length) {
                   <mat-chip-set aria-label="Selected file count">
                     <mat-chip>{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</mat-chip>
                   </mat-chip-set>
                 }
               </div>
-              </div>
+
               @if (uploadMessage(); as message) {
                 <p class="upload-message" role="alert">{{ message }}</p>
               }
@@ -55,7 +60,6 @@
               <div class="workspace__grid">
                 <section class="panel" aria-labelledby="uploaded-files-title">
                   <h3 id="uploaded-files-title">Uploaded files</h3>
-
                   @if (files().length) {
                     <ca-uploaded-file-list
                       [files]="files()"
@@ -63,17 +67,16 @@
                   } @else {
                     <p class="empty-state">No files uploaded.</p>
                   }
-
                   <div class="file-actions">
                     <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
                       Add files
                     </button>
                     <button
-                    mat-flat-button
-                    type="button"
-                    (click)="triggerOcr()"
-                    [disabled]="!files().length || ocrLoading()">
-                    {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
+                      mat-flat-button
+                      type="button"
+                      (click)="triggerOcr()"
+                      [disabled]="!files().length || ocrLoading()">
+                      {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
                     </button>
                   </div>
                   @if (ocrMessage(); as message) {
@@ -97,9 +100,10 @@
             }
           }
         </div>
-      }
-    </main>
-  </div>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+
   <footer class="save-footer">
     @if (documentStore.persistenceWarning(); as warning) {
       <p class="status-message" role="alert">{{ warning }}</p>
