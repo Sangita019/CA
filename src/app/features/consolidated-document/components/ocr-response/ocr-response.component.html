@@ -1,24 +1,28 @@
 <section class="ocr-panel" aria-labelledby="ocr-title">
   <div class="ocr-panel__header">
     <div>
+      <p class="eyebrow">DOCUMENT ANALYSIS</p>
       <h2 id="ocr-title">OCR response</h2>
-      <p>OCR response values are read-only. Document ID can be corrected before confirmation.</p>
+      <p class="ocr-description">Review the extracted values before confirming the document ID.</p>
     </div>
+    <span class="mock-label">Sample OCR</span>
   </div>
-  <div class="ocr-fields">
-    @for (field of result().fields; track field.key) {
-      <mat-form-field appearance="outline">
-        <mat-label>{{ field.label }}</mat-label>
-        <input matInput [value]="field.value" readonly />
-      </mat-form-field>
-    }
+  <div class="ocr-table-wrap">
+    <table class="ocr-table">
+      <thead><tr><th scope="col">Field</th><th scope="col">OCR response</th></tr></thead>
+      <tbody>
+        @for (field of result().fields; track field.key) {
+          <tr><th scope="row">{{ field.label }}</th><td>{{ field.value || '—' }}</td></tr>
+        }
+      </tbody>
+    </table>
   </div>
   <div class="document-id">
     <mat-form-field appearance="outline">
       <mat-label>Document ID</mat-label>
       <input matInput [formControl]="documentIdControl()" autocomplete="off" />
     </mat-form-field>
-    <button mat-stroked-button type="button" (click)="confirmRequested.emit()">Confirm</button>
+    <button mat-flat-button type="button" (click)="confirmRequested.emit()">Confirm</button>
   </div>
   @if (confirmationMessage(); as message) {
     <p class="status-message" role="status">{{ message }}</p>
