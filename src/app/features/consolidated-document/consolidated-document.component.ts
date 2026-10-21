@@ -334,14 +334,24 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
-    try {
-      if (!remaining.length) {
-        await this.fileStorage.deleteBundle(document.id, tab.id);
-        this.documentStore.clearDocument(document.id, tab.id);
+    if (!remaining.length) {
+      // A category can contain stale records from an earlier selected document.
+      // Clear its status immediately so the collapsed header returns to Not Started.
+      const savedRecords = this.documentStore.records().filter((record) => record.tabId === tab.id);
+      this.documentStore.clearTab(tab.id);
+      try {
+        const documentIds = new Set([document.id, ...savedRecords.map((record) => record.documentId)]);
+        await Promise.all(Array.from(documentIds, (savedDocumentId) =>
+          this.fileStorage.deleteBundle(savedDocumentId, tab.id)
+        ));
         this.saveMessage.set('The file was deleted from this browser.');
-        return;
+      } catch {
+        this.saveMessage.set('The file was removed from this view and the category status was reset, but saved browser data could not be fully cleared.');
       }
+      return;
+    }
 
+    try {
       if (wasSaved) {
         await this.fileStorage.saveBundle({
           documentId: document.id,
