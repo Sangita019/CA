@@ -1,15 +1,6 @@
+@use './consolidated-document-header';
 :host { display: block; min-width: 0; color: #243247; }
 .screen { box-sizing: border-box; min-width: 0; padding: 20px 24px; background: #f7f9fc; }
-.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
-.eyebrow { margin: 0 0 5px; color: #6b7a90; font-size: 11px; font-weight: 700; letter-spacing: .1em; }
-.page-header h1 { margin: 0; font-size: clamp(20px, 2.2vw, 26px); line-height: 1.25; font-weight: 650; }
-.page-description { margin: 7px 0 0; color: #637187; font-size: 13px; }
-.workflow-label { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid #d7e2ef; border-radius: 6px; background: #fff; color: #52647c; font-size: 12px; white-space: nowrap; }
-.workflow-dot { width: 7px; height: 7px; border-radius: 50%; background: #248a79; }
-.selected-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 11px 14px; border: 1px solid #e0e7f0; border-radius: 6px 6px 0 0; background: #fff; font-size: 12px; }
-.selected-summary strong { color: #5c6b80; }
-.selected-summary > span:not(.summary-note) { padding: 4px 9px; border-radius: 14px; background: #e5f4f0; color: #216f62; font-weight: 600; }
-.summary-note { margin-left: auto; color: #718096; }
 .category-panel { margin-top: 16px; padding: 18px; border: 1px solid #dfe6ef; border-radius: 7px; background: #fff; box-shadow: 0 2px 6px rgb(22 43 71 / 4%); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
 .section-heading h2 { margin: 0; font-size: 15px; font-weight: 700; color: #25364d; }
