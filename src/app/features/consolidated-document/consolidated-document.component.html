@@ -20,7 +20,7 @@
     (tabSelected)="selectTab($event)" />
 
   @if (tabs()[selectedTabIndex()]; as tab) {
-    <section class="category-panel" [attr.aria-label]="tab.label + ' document options'">
+    <section class="category-panel" [id]="'document-tab-panel-' + tab.id" [attr.aria-label]="tab.label + ' document options'" role="tabpanel">
       <div class="section-heading">
         <div>
           <h2>{{ tab.label }} <span class="muted">— select 1 document</span></h2>
