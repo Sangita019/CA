@@ -11,7 +11,7 @@
   <div class="selected-summary" aria-label="Document upload instructions">
     <strong>Documents selected</strong>
     @for (tab of tabs(); track tab.id; let index = $index) {
-      @if (documentStore.records().some(record => record.tabId === tab.id && record.status === 'saved')) {
+      @if (categorySaved(tab)) {
         <span class="summary-chip summary-chip--saved">{{ tab.label }} · Saved</span>
       } @else {
         <span class="summary-chip">{{ tab.label }}</span>
