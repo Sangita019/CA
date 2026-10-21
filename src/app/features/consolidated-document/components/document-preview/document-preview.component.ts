@@ -3,7 +3,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { OcrPdfViewerComponent } from '../../ocr-pdf-viewer-editor.component';
 import { ImageEditorComponent } from '../../image-editor.component';
 import { UploadedDocumentFile } from '../../models/consolidated-document.models';
-import { IEditorControlManager } from '../../../../models/editor-image.model';
 
 @Component({
   selector: 'ca-document-preview',
@@ -19,7 +18,7 @@ export class DocumentPreviewComponent {
   readonly fileSelected = output<string>();
   readonly previewFile = computed(() => this.files().find((file) => file.id === this.selectedFileId()) ?? this.files()[0] ?? null);
   readonly imageEditorFiles = signal<Array<{ content: string; fileId: null; localFileId: string }>>([]);
-  readonly imageEditorControls: IEditorControlManager = { controls: [], isEditable: false };
+  readonly imageEditorControls = { controls: [], isEditable: false };
   private conversionVersion = 0;
 
   constructor() {
