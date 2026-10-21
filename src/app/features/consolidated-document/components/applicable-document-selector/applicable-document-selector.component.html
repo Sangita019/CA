@@ -1,27 +1,26 @@
 <section aria-labelledby="document-selector-title">
-  <h2 id="document-selector-title" class="section-title">Applicable documents</h2>
-  <mat-radio-group class="document-list" [value]="selectedDocumentId()"
-    (change)="documentSelected.emit($event.value)">
+  <div class="document-list" role="radiogroup" aria-labelledby="document-selector-title">
     @for (document of documents(); track document.id) {
-      <mat-card class="document-card" [class.document-card--selected]="selectedDocumentId() === document.id">
-        <mat-radio-button [value]="document.id" [disabled]="unavailableDocumentIds().has(document.id)">
-          {{ document.label }}
-        </mat-radio-button>
-        @if (unavailableDocumentIds().has(document.id)) {
-          <mat-chip-set aria-label="Document status">
-            <mat-chip>Already uploaded</mat-chip>
-          </mat-chip-set>
-          <p class="duplicate-message" role="status">Already completed in a previous step.</p>
-        } @else if (document.required) {
-          <mat-chip-set aria-label="Document requirement">
-            <mat-chip>Mandatory</mat-chip>
-          </mat-chip-set>
-        } @else {
-          <mat-chip-set aria-label="Document requirement">
-            <mat-chip>Optional</mat-chip>
-          </mat-chip-set>
+      <button type="button" class="document-card"
+        [class.document-card--selected]="selectedDocumentId() === document.id"
+        [class.document-card--disabled]="unavailableDocumentIds().has(document.id)"
+        [attr.role]="'radio'"
+        [attr.aria-checked]="selectedDocumentId() === document.id"
+        [attr.aria-disabled]="unavailableDocumentIds().has(document.id)"
+        [disabled]="unavailableDocumentIds().has(document.id)"
+        (click)="documentSelected.emit(document.id)">
+        <span class="document-icon" aria-hidden="true">{{ document.label.toLowerCase().includes('pan') ? '▤' : document.label.toLowerCase().includes('passport') ? '▣' : '▧' }}</span>
+        <span class="document-card__body">
+          <strong>{{ document.label }}</strong>
+          <small>{{ document.required ? 'Mandatory' : 'Optional' }}</small>
+          @if (unavailableDocumentIds().has(document.id)) {
+            <small class="duplicate-message">Already uploaded in another category</small>
+          }
+        </span>
+        @if (selectedDocumentId() === document.id) {
+          <span class="selected-check" aria-hidden="true">✓</span>
         }
-      </mat-card>
+      </button>
     }
-  </mat-radio-group>
+  </div>
 </section>
