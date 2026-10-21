@@ -29,7 +29,6 @@ import { ConsolidatedDocumentMockService } from './services/consolidated-documen
 import { DocumentFileStorageService } from './services/document-file-storage.service';
 import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
 import { UploadedFileListComponent } from './components/uploaded-file-list/uploaded-file-list.component';
-import { DocumentCategoryTabsComponent } from './components/document-category-tabs/document-category-tabs.component';
 import { ApplicableDocumentSelectorComponent } from './components/applicable-document-selector/applicable-document-selector.component';
 import { DocumentPreviewComponent } from './components/document-preview/document-preview.component';
 import { OcrResponseComponent } from './components/ocr-response/ocr-response.component';
@@ -39,6 +38,7 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     id: 'overseas-address',
     label: 'Overseas Address',
     documents: [
+      { id: 'passport', label: 'Passport', required: true },
       { id: 'overseas-address-proof', label: 'Overseas Address Proof', required: true }
     ]
   },
@@ -46,6 +46,7 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     id: 'current-address',
     label: 'Indian Address',
     documents: [
+      { id: 'passport', label: 'Passport', required: true },
       { id: 'address-proof', label: 'Address Proof', required: true }
     ]
   },
@@ -75,7 +76,6 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatExpansionModule,
     ReactiveFormsModule,
     UploadedFileListComponent,
-    DocumentCategoryTabsComponent,
     ApplicableDocumentSelectorComponent,
     DocumentPreviewComponent,
     OcrResponseComponent
