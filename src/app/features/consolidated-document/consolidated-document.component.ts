@@ -128,6 +128,12 @@ export class ConsolidatedDocumentComponent {
       .map((document) => document.id));
   });
 
+  categorySaved(tab: ConsolidatedDocumentTab): boolean {
+    return this.documentStore.records().some((record) =>
+      record.tabId === tab.id && record.status === 'saved'
+    );
+  }
+
   categoryDocumentLabel(tab: ConsolidatedDocumentTab): string {
     const selected = tab.documents.find((document) =>
       document.id === this.selectedDocumentId() && this.tabs()[this.selectedTabIndex()]?.id === tab.id
@@ -161,7 +167,9 @@ export class ConsolidatedDocumentComponent {
     }
 
     const nextTab = this.tabs()[index];
-    const nextDocumentId = nextTab?.documents[0]?.id ?? null;
+    const nextDocumentId = nextTab?.documents.find((document) =>
+      !this.documentStore.isUnavailableInTab(document, nextTab.id)
+    )?.id ?? nextTab?.documents[0]?.id ?? null;
     this.changeSelectionWithConfirmation(() => {
       this.selectedTabIndex.set(index);
       this.selectedDocumentId.set(nextDocumentId);
