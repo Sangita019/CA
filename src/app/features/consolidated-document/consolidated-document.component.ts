@@ -13,6 +13,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import {
   ConsolidatedDocumentOption,
@@ -35,36 +36,30 @@ import { OcrResponseComponent } from './components/ocr-response/ocr-response.com
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
+    id: 'overseas-address',
+    label: 'Overseas Address',
+    documents: [
+      { id: 'overseas-address-proof', label: 'Overseas Address Proof', required: true }
+    ]
+  },
+  {
+    id: 'current-address',
+    label: 'Indian Address',
+    documents: [
+      { id: 'address-proof', label: 'Address Proof', required: true }
+    ]
+  },
+  {
     id: 'officially-valid-documents',
-    label: 'Officially Valid Documents',
+    label: 'Identity',
     documents: [
       { id: 'passport', label: 'Passport', required: true },
       { id: 'driving-licence', label: 'Driving Licence', required: true },
       { id: 'epic-voter-card', label: 'EPIC / Voter Card', required: true },
       { id: 'nrega-job-card', label: 'NREGA Job Card', required: false },
-      { id: 'aadhaar', label: 'Aadhaar', required: false }
-    ]
-  },
-  {
-    id: 'current-address',
-    label: 'Current Address',
-    documents: [
-      { id: 'address-proof', label: 'Address Proof', required: true },
-      { id: 'passport', label: 'Passport', required: false }
-    ]
-  },
-  {
-    id: 'pan-form-60',
-    label: 'PAN / Form-60',
-    documents: [
+      { id: 'aadhaar', label: 'Aadhaar', required: false },
       { id: 'pan', label: 'PAN', required: true },
-      { id: 'form-60', label: 'Form-60', required: false }
-    ]
-  },
-  {
-    id: 'supporting-documents',
-    label: 'Supporting Documents',
-    documents: [
+      { id: 'form-60', label: 'Form-60', required: false },
       { id: 'supporting-document', label: 'Supporting Document', required: false }
     ]
   }
@@ -77,6 +72,7 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatButtonModule,
     MatDialogModule,
     MatChipsModule,
+    MatExpansionModule,
     ReactiveFormsModule,
     UploadedFileListComponent,
     DocumentCategoryTabsComponent,
@@ -131,6 +127,33 @@ export class ConsolidatedDocumentComponent {
       .filter((document) => tab && this.documentStore.isUnavailableInTab(document, tab.id))
       .map((document) => document.id));
   });
+
+  categoryDocumentLabel(tab: ConsolidatedDocumentTab): string {
+    const selected = tab.documents.find((document) =>
+      document.id === this.selectedDocumentId() && this.tabs()[this.selectedTabIndex()]?.id === tab.id
+    );
+    const saved = this.documentStore.records().find((record) =>
+      record.tabId === tab.id && record.status === 'saved'
+    );
+    return selected?.label ?? saved?.documentLabel ?? 'No document selected';
+  }
+
+  categoryStatus(tab: ConsolidatedDocumentTab, index: number): string {
+    if (index === this.selectedTabIndex() && this.ocrLoading()) return 'OCR in Progress';
+    if (index === this.selectedTabIndex() && this.ocrResult()) return 'OCR Complete';
+    if (this.documentStore.records().some((record) => record.tabId === tab.id && record.status === 'saved')) {
+      return 'Saved';
+    }
+    if (index === this.selectedTabIndex() && this.files().length) return 'Files Selected';
+    return 'Not Started';
+  }
+
+  categoryStatusColor(tab: ConsolidatedDocumentTab, index: number): 'primary' | 'accent' | 'warn' {
+    const status = this.categoryStatus(tab, index);
+    if (status === 'Saved' || status === 'OCR Complete') return 'primary';
+    if (status === 'OCR in Progress' || status === 'Files Selected') return 'accent';
+    return 'warn';
+  }
 
   selectTab(index: number): void {
     if (index === this.selectedTabIndex()) {
