@@ -10,95 +10,120 @@
 
   <div class="selected-summary" aria-label="Document upload instructions">
     <strong>Documents selected</strong>
-    <span>{{ tabs()[selectedTabIndex()]?.label ?? 'No category selected' }}</span>
+    @for (tab of tabs(); track tab.id; let index = $index) {
+      @if (documentStore.records().some(record => record.tabId === tab.id && record.status === 'saved')) {
+        <span class="summary-chip summary-chip--saved">{{ tab.label }} · Saved</span>
+      } @else {
+        <span class="summary-chip">{{ tab.label }}</span>
+      }
+    }
     <span class="summary-note">Select one document per category</span>
   </div>
 
-  <ca-document-category-tabs
-    [tabs]="tabs()"
-    [selectedIndex]="selectedTabIndex()"
-    (tabSelected)="selectTab($event)" />
+  <mat-accordion class="category-accordion" [multi]="false">
+    @for (tab of tabs(); track tab.id; let index = $index) {
+      <mat-expansion-panel class="category-panel"
+        [expanded]="selectedTabIndex() === index"
+        (opened)="selectTab(index)"
+        [attr.aria-label]="tab.label">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="category-heading">
+              <span class="category-heading__title">{{ tab.label }}</span>
+              <span class="category-heading__document">{{ categoryDocumentLabel(tab) }}</span>
+            </span>
+          </mat-panel-title>
+          <mat-panel-description>
+            <span class="section-status"
+              [class.section-status--complete]="categoryStatus(tab, index) === 'Saved'">
+              {{ categoryStatus(tab, index) }}
+            </span>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
 
-  @if (tabs()[selectedTabIndex()]; as tab) {
-    <section class="category-panel" [id]="'document-tab-panel-' + tab.id" [attr.aria-label]="tab.label + ' document options'" role="tabpanel">
-      <div class="section-heading">
-        <div>
-          <h2>{{ tab.label }} <span class="muted">— select 1 document</span></h2>
-          <p>Choose the document type that matches the file you are uploading.</p>
-        </div>
-        <span class="section-status" [class.section-status--complete]="categoryStatus(tab, selectedTabIndex()) === 'Saved'">
-          {{ categoryStatus(tab, selectedTabIndex()) }}
-        </span>
-      </div>
-
-      <ca-applicable-document-selector
-        [documents]="tab.documents"
-        [selectedDocumentId]="selectedDocumentId()"
-        [unavailableDocumentIds]="unavailableDocumentIds()"
-        (documentSelected)="selectDocument($event)" />
-
-      @if (selectedDocument(); as document) {
-        <section class="upload-section" aria-labelledby="upload-title">
-          <div class="section-heading upload-heading">
-            <div>
-              <h2 id="upload-title">Upload {{ document.label }}</h2>
-              <p>Upload 1 PDF or up to 5 images (JPEG, JPG, JFIF, PNG), maximum 10 MB each.</p>
+        @if (selectedTabIndex() === index) {
+          <div class="category-content" [id]="'document-tab-panel-' + tab.id"
+            [attr.aria-label]="tab.label + ' document options'">
+            <div class="section-heading">
+              <div>
+                <h2>{{ tab.label }} <span class="muted">— select 1 document</span></h2>
+                <p>Choose the document type that matches the file you are uploading.</p>
+              </div>
             </div>
-            @if (files().length) {
-              <span class="file-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
+
+            <ca-applicable-document-selector
+              [documents]="tab.documents"
+              [selectedDocumentId]="selectedDocumentId()"
+              [unavailableDocumentIds]="unavailableDocumentIds()"
+              (documentSelected)="selectDocument($event)" />
+
+            @if (selectedDocument(); as document) {
+              <section class="upload-section" aria-labelledby="upload-title">
+                <div class="section-heading upload-heading">
+                  <div>
+                    <h2 id="upload-title">Upload {{ document.label }}</h2>
+                    <p>Upload 1 PDF or up to 5 images (JPEG, JPG, JFIF, PNG), maximum 10 MB each.</p>
+                  </div>
+                  @if (files().length) {
+                    <span class="file-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
+                  }
+                </div>
+
+                <input #fileInput class="visually-hidden" type="file" multiple
+                  accept=".pdf,.jpeg,.jpg,.jfif,.png,application/pdf,image/jpeg,image/png"
+                  (change)="filesSelected($event)" />
+
+                <div class="upload-controls">
+                  <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
+                    <span class="button-symbol" aria-hidden="true">＋</span> Choose file(s)
+                  </button>
+                  <button mat-flat-button type="button" (click)="triggerOcr()"
+                    [disabled]="!files().length || ocrLoading()">
+                    {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
+                  </button>
+                  @if (uploadMessage(); as message) {
+                    <span class="inline-message" role="alert">{{ message }}</span>
+                  }
+                </div>
+
+                @if (files().length) {
+                  <section class="uploaded-files" aria-labelledby="uploaded-files-title">
+                    <h3 id="uploaded-files-title">Uploaded files</h3>
+                    <ca-uploaded-file-list [files]="files()" (removeRequested)="removeFile($event)" />
+                  </section>
+                } @else {
+                  <div class="drop-hint">
+                    <span class="upload-icon" aria-hidden="true">↑</span>
+                    <strong>No file selected</strong>
+                    <span>Choose a PDF or image file to begin.</span>
+                  </div>
+                }
+
+                @if (ocrMessage(); as message) {
+                  <p class="feedback-message" role="status">{{ message }}</p>
+                }
+              </section>
+
+              @if (ocrResult(); as result) {
+                <div class="analysis-layout">
+                  <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
+                    (fileSelected)="selectPreview($event)" />
+                  <ca-ocr-response [result]="result" [documentIdControl]="documentIdControl"
+                    [confirmationMessage]="documentIdConfirmationMessage()"
+                    (confirmRequested)="confirmDocumentId()" />
+                </div>
+              } @else if (files().length) {
+                <div class="analysis-layout analysis-layout--preview-only">
+                  <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
+                    (fileSelected)="selectPreview($event)" />
+                </div>
+              }
             }
           </div>
-
-          <input #fileInput class="visually-hidden" type="file" multiple
-            accept=".pdf,.jpeg,.jpg,.jfif,.png,application/pdf,image/jpeg,image/png"
-            (change)="filesSelected($event)" />
-
-          <div class="upload-controls">
-            <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
-              <span class="button-symbol" aria-hidden="true">＋</span> Choose file(s)
-            </button>
-            <button mat-flat-button type="button" (click)="triggerOcr()"
-              [disabled]="!files().length || ocrLoading()">
-              {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
-            </button>
-            @if (uploadMessage(); as message) {
-              <span class="inline-message" role="alert">{{ message }}</span>
-            }
-          </div>
-
-          @if (files().length) {
-            <section class="uploaded-files" aria-labelledby="uploaded-files-title">
-              <h3 id="uploaded-files-title">Uploaded files</h3>
-              <ca-uploaded-file-list [files]="files()" (removeRequested)="removeFile($event)" />
-            </section>
-          } @else {
-            <div class="drop-hint">
-              <span class="upload-icon" aria-hidden="true">↑</span>
-              <strong>No file selected</strong>
-              <span>Choose a PDF or image file to begin.</span>
-            </div>
-          }
-
-          @if (ocrMessage(); as message) {
-            <p class="feedback-message" role="status">{{ message }}</p>
-          }
-        </section>
-
-        @if (ocrResult(); as result) {
-          <div class="analysis-layout">
-            <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
-              (fileSelected)="selectPreview($event)" />
-            <ca-ocr-response [result]="result" [documentIdControl]="documentIdControl"
-              [confirmationMessage]="documentIdConfirmationMessage()"
-              (confirmRequested)="confirmDocumentId()" />
-          </div>
-        } @else if (files().length) {
-          <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
-            (fileSelected)="selectPreview($event)" />
         }
-      }
-    </section>
-  }
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
 
   <footer class="save-footer">
     <div class="footer-messages">
