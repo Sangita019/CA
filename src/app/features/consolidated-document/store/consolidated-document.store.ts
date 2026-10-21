@@ -52,6 +52,11 @@ export class ConsolidatedDocumentStore {
     this.persist();
   }
 
+  clearTab(tabId: string): void {
+    this.records.update((records) => records.filter((record) => record.tabId !== tabId));
+    this.persist();
+  }
+
   select(tabId: string, documentId: string | null): void {
     this.selectedTabId.set(tabId);
     this.selectedDocumentId.set(documentId);
