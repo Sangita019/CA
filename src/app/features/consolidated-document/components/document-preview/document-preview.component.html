@@ -5,11 +5,11 @@
       @if (imageEditorFiles().length) {
         <div class="image-editor-host">
           <app-image-editor
-          [imageFiles]="imageEditorFiles()"
-          [showControls]="imageEditorControls"
-          [maxCompressSizeInMb]="5"
-          [useSampleImage]="false"
-          [loadSampleOcr]="false" />
+            [imageFiles]="imageEditorFiles()"
+            [showControls]="imageEditorControls"
+            [maxCompressSizeInMb]="5"
+            [useSampleImage]="false"
+            [loadSampleOcr]="false" />
         </div>
       } @else {
         <p class="empty-state" role="status">Preparing image preview…</p>
@@ -17,7 +17,7 @@
     } @else {
       <div class="pdf-viewer-host">
         <app-ocr-pdf-viewer-editor
-          [pdfSrc]="file.objectUrl"
+          [pdfSrc]="file.sourceFile ?? file.objectUrl"
           [loadSampleOcr]="false" />
       </div>
     }
