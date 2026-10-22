@@ -306,6 +306,9 @@ export class ConsolidatedDocumentComponent {
     this.documentIdConfirmationMessage.set(null);
     this.saveMessage.set(null);
     this.uploadMessage.set(null);
+
+    // Keep an IndexedDB draft as soon as files are selected, so refresh does not discard them.
+    void this.persistDraftBundle(nextFiles);
   }
 
   async removeFile(fileId: string): Promise<void> {
@@ -352,22 +355,22 @@ export class ConsolidatedDocumentComponent {
     }
 
     try {
-      if (wasSaved) {
-        await this.fileStorage.saveBundle({
-          documentId: document.id,
-          tabId: tab.id,
-          documentLabel: document.label,
-          confirmedDocumentId: this.confirmedDocumentId(),
-          files: remaining.map((item) => ({
-            id: item.id,
-            name: item.name,
-            type: item.type,
-            size: item.size,
-            blob: item.sourceFile
-          }))
-        });
-        this.saveMessage.set('The file was removed from the saved document.');
-      }
+      await this.fileStorage.saveBundle({
+        documentId: document.id,
+        tabId: tab.id,
+        documentLabel: document.label,
+        confirmedDocumentId: this.confirmedDocumentId(),
+        files: remaining.map((item) => ({
+          id: item.id,
+          name: item.name,
+          type: item.type,
+          size: item.size,
+          blob: item.sourceFile
+        }))
+      });
+      this.saveMessage.set(wasSaved
+        ? 'The file was removed from the saved document.'
+        : 'The file was removed from the local draft.');
     } catch {
       this.saveMessage.set('The file was removed from the current view, but browser storage could not be updated.');
     }
@@ -467,6 +470,41 @@ export class ConsolidatedDocumentComponent {
       this.saveMessage.set('Could not save files in browser storage. Check available storage and try again.');
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  private async persistDraftBundle(
+    files: readonly (UploadedDocumentFile & { sourceFile: File })[]
+  ): Promise<void> {
+    const document = this.selectedDocument();
+    const tab = this.tabs()[this.selectedTabIndex()];
+    if (!document || !tab) {
+      return;
+    }
+
+    try {
+      if (!files.length) {
+        await this.fileStorage.deleteBundle(document.id, tab.id);
+        return;
+      }
+
+      await this.fileStorage.saveBundle({
+        documentId: document.id,
+        tabId: tab.id,
+        documentLabel: document.label,
+        confirmedDocumentId: this.confirmedDocumentId(),
+        files: files.map((file) => ({
+          id: file.id,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          blob: file.sourceFile
+        }))
+      });
+    } catch {
+      this.saveMessage.set(
+        'Files are selected, but browser storage could not keep a draft. They may be lost after refresh.'
+      );
     }
   }
 
