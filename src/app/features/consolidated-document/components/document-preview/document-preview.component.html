@@ -3,12 +3,14 @@
   @if (previewFile(); as file) {
     @if (file.type === 'image') {
       @if (imageEditorFiles().length) {
-        <app-image-editor
+        <div class="image-editor-host">
+          <app-image-editor
           [imageFiles]="imageEditorFiles()"
           [showControls]="imageEditorControls"
           [maxCompressSizeInMb]="5"
           [useSampleImage]="false"
           [loadSampleOcr]="false" />
+        </div>
       } @else {
         <p class="empty-state" role="status">Preparing image preview…</p>
       }
