@@ -4,6 +4,8 @@ import { OcrPdfViewerComponent } from '../../ocr-pdf-viewer-editor.component';
 import { ImageEditorComponent } from '../../image-editor.component';
 import { UploadedDocumentFile } from '../../models/consolidated-document.models';
 
+type PreviewDocumentFile = UploadedDocumentFile & { readonly sourceFile?: File };
+
 @Component({
   selector: 'ca-document-preview',
   standalone: true,
@@ -13,7 +15,7 @@ import { UploadedDocumentFile } from '../../models/consolidated-document.models'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentPreviewComponent {
-  readonly files = input.required<readonly UploadedDocumentFile[]>();
+  readonly files = input.required<readonly PreviewDocumentFile[]>();
   readonly selectedFileId = input<string | null>(null);
   readonly fileSelected = output<string>();
   readonly previewFile = computed(() => this.files().find((file) => file.id === this.selectedFileId()) ?? this.files()[0] ?? null);
