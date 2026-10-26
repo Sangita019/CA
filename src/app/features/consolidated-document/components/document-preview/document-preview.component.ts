@@ -20,6 +20,8 @@ export class DocumentPreviewComponent {
   readonly fileSelected = output<string>();
   readonly previewFile = computed(() => this.files().find((file) => file.id === this.selectedFileId()) ?? this.files()[0] ?? null);
   readonly imageEditorFiles = signal<Array<{ content: string; fileId: null; localFileId: string }>>([]);
+  readonly pdfViewerSource = signal<Uint8Array | null>(null);
+  readonly pdfPreviewError = signal<string | null>(null);
   readonly imageEditorControls = { controls: [], isEditable: false };
   private conversionVersion = 0;
 
@@ -28,7 +30,29 @@ export class DocumentPreviewComponent {
       const file = this.previewFile();
       const version = ++this.conversionVersion;
       this.imageEditorFiles.set([]);
-      if (!file || file.type !== 'image') return;
+      this.pdfViewerSource.set(null);
+      this.pdfPreviewError.set(null);
+      if (!file) return;
+      if (file.type !== 'image') {
+        const source = file.sourceFile
+          ? file.sourceFile.arrayBuffer()
+          : fetch(file.objectUrl).then((response) => {
+              if (!response.ok) throw new Error('Could not read uploaded PDF.');
+              return response.arrayBuffer();
+            });
+        void source
+          .then((buffer) => {
+            if (version === this.conversionVersion) {
+              this.pdfViewerSource.set(new Uint8Array(buffer));
+            }
+          })
+          .catch(() => {
+            if (version === this.conversionVersion) {
+              this.pdfPreviewError.set('Unable to load this PDF preview. Please remove the file and upload it again.');
+            }
+          });
+        return;
+      }
       void fetch(file.objectUrl)
         .then((response) => {
           if (!response.ok) throw new Error('Could not read uploaded image.');
