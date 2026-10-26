@@ -16,9 +16,15 @@
       }
     } @else {
       <div class="pdf-viewer-host">
-        <app-ocr-pdf-viewer-editor
-          [pdfSrc]="file.sourceFile ?? file.objectUrl"
-          [loadSampleOcr]="false" />
+        @if (pdfViewerSource(); as pdfSource) {
+          <app-ocr-pdf-viewer-editor
+            [pdfSrc]="pdfSource"
+            [loadSampleOcr]="false" />
+        } @else if (pdfPreviewError(); as previewError) {
+          <p class="empty-state" role="alert">{{ previewError }}</p>
+        } @else {
+          <p class="empty-state" role="status">Preparing PDF preview…</p>
+        }
       </div>
     }
   } @else {
