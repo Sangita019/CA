@@ -110,6 +110,7 @@
                     (fileSelected)="selectPreview($event)" />
                   <ca-ocr-response [result]="result" [documentIdControl]="documentIdControl"
                     [confirmationMessage]="documentIdConfirmationMessage()"
+                    [documentIdConfirmed]="confirmedDocumentId() !== null"
                     (confirmRequested)="confirmDocumentId()" />
                 </div>
               } @else if (files().length) {
