@@ -77,7 +77,7 @@
                   <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
                     <span class="button-symbol" aria-hidden="true">＋</span> Choose file(s)
                   </button>
-                  <button mat-flat-button type="button" (click)="triggerOcr()"
+                  <button mat-flat-button color="primary" type="button" (click)="triggerOcr()"
                     [disabled]="!files().length || ocrLoading()">
                     {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
                   </button>
@@ -135,7 +135,7 @@
         <p class="feedback-message" role="status">{{ message }}</p>
       }
     </div>
-    <button mat-flat-button type="button" (click)="save()" [disabled]="saving()">
+    <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="saving()">
       {{ saving() ? 'Saving…' : 'Save Tab' }}
     </button>
   </footer>
