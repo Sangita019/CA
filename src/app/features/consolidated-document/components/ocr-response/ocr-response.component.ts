@@ -17,5 +17,6 @@ export class OcrResponseComponent {
   readonly result = input.required<OcrResult>();
   readonly documentIdControl = input.required<FormControl<string>>();
   readonly confirmationMessage = input<string | null>(null);
+  readonly documentIdConfirmed = input(false);
   readonly confirmRequested = output<void>();
 }
