@@ -20,9 +20,13 @@
   <div class="document-id">
     <mat-form-field appearance="outline">
       <mat-label>Document ID</mat-label>
-      <input matInput [formControl]="documentIdControl()" autocomplete="off" />
+      <input matInput [formControl]="documentIdControl()" [readonly]="documentIdConfirmed()" autocomplete="off" />
     </mat-form-field>
-    <button mat-flat-button type="button" (click)="confirmRequested.emit()">Confirm</button>
+    @if (!documentIdConfirmed()) {
+      <button mat-flat-button type="button" (click)="confirmRequested.emit()">Confirm</button>
+    } @else {
+      <span class="confirmed-label" role="status">Confirmed</span>
+    }
   </div>
   @if (confirmationMessage(); as message) {
     <p class="status-message" role="status">{{ message }}</p>
