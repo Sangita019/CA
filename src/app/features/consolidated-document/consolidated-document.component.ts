@@ -427,29 +427,24 @@ export class ConsolidatedDocumentComponent {
     this.documentIdConfirmationMessage.set('Document ID confirmed for this mock session.');
   }
 
-  async save(): Promise<void> {
+  async saveDocument(): Promise<void> {
     const document = this.selectedDocument();
-    if (!document || !this.files().length) {
-      this.saveMessage.set('Select a document and upload at least one file before saving.');
-      return;
-    }
-
     const tab = this.tabs()[this.selectedTabIndex()];
-    if (!tab) {
-      this.saveMessage.set('The selected document category is unavailable.');
+    const files = this.files();
+    if (!document || !tab || !files.length) {
+      this.saveMessage.set('Select a document and upload at least one file before saving this document.');
       return;
     }
 
     this.saving.set(true);
     this.saveMessage.set(null);
-
     try {
       await this.fileStorage.saveBundle({
         documentId: document.id,
         tabId: tab.id,
         documentLabel: document.label,
         confirmedDocumentId: this.confirmedDocumentId(),
-        files: this.files().map((file) => ({
+        files: files.map((file) => ({
           id: file.id,
           name: file.name,
           type: file.type,
@@ -457,17 +452,38 @@ export class ConsolidatedDocumentComponent {
           blob: file.sourceFile
         }))
       });
-
-      this.documentStore.markSaved(
-        document.id,
-        tab.id,
-        document.label,
-        this.confirmedDocumentId()
-      );
-      this.saved.emit();
-      this.saveMessage.set('Saved in this browser. Files will remain available after refresh on this browser and device; they are not sent to a backend.');
+      this.documentStore.markUploaded({
+        documentId: document.id,
+        tabId: tab.id,
+        documentLabel: document.label,
+        confirmedDocumentId: this.confirmedDocumentId()
+      });
+      this.saveMessage.set('Document saved. Use Save Tab to finalize this entire category.');
     } catch {
-      this.saveMessage.set('Could not save files in browser storage. Check available storage and try again.');
+      this.saveMessage.set('Could not save this document in browser storage. Check available storage and try again.');
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  async saveTab(): Promise<void> {
+    const tab = this.tabs()[this.selectedTabIndex()];
+    if (!tab) {
+      this.saveMessage.set('The selected document category is unavailable.');
+      return;
+    }
+    if (!this.documentStore.hasUploadedDocuments(tab.id) &&
+        !this.documentStore.records().some((record) => record.tabId === tab.id && record.status === 'saved')) {
+      this.saveMessage.set('Save at least one document in this category before saving the tab.');
+      return;
+    }
+
+    this.saving.set(true);
+    this.saveMessage.set(null);
+    try {
+      this.documentStore.markTabSaved(tab.id);
+      this.saved.emit();
+      this.saveMessage.set('The document category has been saved in this browser.');
     } finally {
       this.saving.set(false);
     }
