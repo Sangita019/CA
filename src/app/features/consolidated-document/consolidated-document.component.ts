@@ -195,7 +195,7 @@ export class ConsolidatedDocumentComponent {
       this.documentStore.records().some((record) =>
         record.documentId === currentDocument.id &&
         record.tabId === currentTab.id &&
-        record.status === 'saved'
+        (record.status === 'uploaded' || record.status === 'saved')
       ));
 
     const proceed = (): void => {
