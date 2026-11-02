@@ -45,6 +45,20 @@ export class ConsolidatedDocumentStore {
     });
   }
 
+  markTabSaved(tabId: string): void {
+    const timestamp = new Date().toISOString();
+    this.records.update((records) => records.map((record) =>
+      record.tabId === tabId && record.status === 'uploaded'
+        ? { ...record, status: 'saved', updatedAt: timestamp }
+        : record
+    ));
+    this.persist();
+  }
+
+  hasUploadedDocuments(tabId: string): boolean {
+    return this.records().some((record) => record.tabId === tabId && record.status === 'uploaded');
+  }
+
   clearDocument(documentId: string, tabId: string): void {
     this.records.update((records) => records.filter((record) =>
       record.documentId !== documentId || record.tabId !== tabId
