@@ -99,6 +99,13 @@
                   </div>
                 }
 
+                <div class="document-save-actions">
+                  <button mat-flat-button color="primary" type="button"
+                    (click)="saveDocument()" [disabled]="!files().length || saving()">
+                    {{ saving() ? 'Saving…' : 'Save Document' }}
+                  </button>
+                </div>
+
                 @if (ocrMessage(); as message) {
                   <p class="feedback-message" role="status">{{ message }}</p>
                 }
@@ -135,7 +142,7 @@
         <p class="feedback-message" role="status">{{ message }}</p>
       }
     </div>
-    <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="saving()">
+    <button mat-flat-button color="primary" type="button" (click)="saveTab()" [disabled]="saving()">
       {{ saving() ? 'Saving…' : 'Save Tab' }}
     </button>
   </footer>
