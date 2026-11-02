@@ -34,3 +34,5 @@
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (max-width: 800px) { .screen { padding: 12px; } .page-header { flex-direction: column; } .category-panel .mat-expansion-panel-header { padding: 10px 12px; } .category-content { padding: 0 0 12px; } .analysis-layout { grid-template-columns: minmax(0, 1fr); } .save-footer { align-items: stretch; flex-direction: column; } .save-footer button { width: 100%; } .summary-note { margin-left: 0; } }
 @media (max-width: 480px) { .section-heading { align-items: flex-start; flex-direction: column; } .selected-summary { gap: 7px; } .upload-controls button { flex: 1 1 auto; } .category-panel mat-panel-description { margin-right: 0; } }
+
+.document-save-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
