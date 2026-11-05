@@ -193,6 +193,9 @@ export class ConsolidatedDocumentComponent {
   onWorkflowSelectionChange(checked: boolean): void {
     this.workflowSelected.set(checked);
     if (!checked) {
+      this.revokeUrls(this.files());
+      this.files.set([]);
+      this.previewFileId.set(null);
       this.ocrResult.set(null);
       this.ocrMessage.set(null);
       this.confirmedDocumentId.set(null);
