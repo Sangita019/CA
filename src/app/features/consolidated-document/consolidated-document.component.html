@@ -11,11 +11,21 @@
   <div class="selected-summary" aria-label="Document upload instructions">
     <strong>Documents selected</strong>
     @for (tab of tabs(); track tab.id; let index = $index) {
-      @if (categorySaved(tab)) {
-        <span class="summary-chip summary-chip--saved">{{ tab.label }} · Saved</span>
-      } @else {
-        <span class="summary-chip">{{ tab.label }}</span>
-      }
+      <button type="button"
+        class="summary-chip"
+        [class.summary-chip--saved]="categorySaved(tab)"
+        [class.summary-chip--active]="selectedTabIndex() === index"
+        [attr.aria-expanded]="selectedTabIndex() === index"
+        [attr.aria-controls]="'document-tab-panel-' + tab.id"
+        [attr.aria-label]="'Open ' + tab.label + ' category. ' + categoryStatus(tab, index)"
+        (click)="selectTab(index)">
+        <span>{{ tab.label }}</span>
+        @if (categorySaved(tab)) {
+          <span class="summary-chip__status">Saved</span>
+        } @else if (categoryDocumentLabel(tab) !== 'No document selected') {
+          <span class="summary-chip__document">{{ categoryDocumentLabel(tab) }}</span>
+        }
+      </button>
     }
     <span class="summary-note">Select one document per category</span>
   </div>
