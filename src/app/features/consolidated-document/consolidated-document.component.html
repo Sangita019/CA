@@ -73,6 +73,7 @@
                 [selected]="workflowSelected()"
                 [ocrCompleted]="ocrResult() !== null"
                 (selectionChange)="onWorkflowSelectionChange($event)"
+                (filesChanged)="onWorkflowFilesChanged()"
                 (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
                 />
 
