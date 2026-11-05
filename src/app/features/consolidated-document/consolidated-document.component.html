@@ -61,81 +61,27 @@
               </div>
             </div>
 
-            <ca-applicable-document-selector
-              [documents]="tab.documents"
-              [selectedDocumentId]="selectedDocumentId()"
-              [unavailableDocumentIds]="unavailableDocumentIds()"
-              (documentSelected)="selectDocument($event)" />
-
             @if (selectedDocument(); as document) {
-              <section class="upload-section" aria-labelledby="upload-title">
-                <div class="section-heading upload-heading">
-                  <div>
-                    <h2 id="upload-title">Upload {{ document.label }}</h2>
-                    <p>Upload 1 PDF or up to 5 images (JPEG, JPG, JFIF, PNG), maximum 10 MB each.</p>
-                  </div>
-                  @if (files().length) {
-                    <span class="file-count">{{ files().length }} file{{ files().length === 1 ? '' : 's' }} selected</span>
-                  }
-                </div>
+              <ca-document-upload-workflow
+                [document]="document"
+                [selected]="workflowSelected()"
+                [ocrCompleted]="ocrResult() !== null"
+                [documentIdentificationNumber]="documentIdentificationNumber()"
+                (selectionChange)="onWorkflowSelectionChange($event)"
+                (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
+                (saveChangesRequested)="saveWorkflowChanges($event)" />
 
-                <input #fileInput class="visually-hidden" type="file" multiple
-                  accept=".pdf,.jpeg,.jpg,.jfif,.png,application/pdf,image/jpeg,image/png"
-                  (change)="filesSelected($event)" />
+              @if (ocrMessage(); as message) {
+                <p class="feedback-message" role="status">{{ message }}</p>
+              }
 
-                <div class="upload-controls">
-                  <button mat-stroked-button type="button" (click)="chooseFiles('add', fileInput)">
-                    <span class="button-symbol" aria-hidden="true">＋</span> Choose file(s)
-                  </button>
-                  <button mat-flat-button color="primary" type="button" (click)="triggerOcr()"
-                    [disabled]="!files().length || ocrLoading()">
-                    {{ ocrLoading() ? 'Processing…' : 'Trigger OCR' }}
-                  </button>
-                  @if (uploadMessage(); as message) {
-                    <span class="inline-message" role="alert">{{ message }}</span>
-                  }
-                </div>
-
-                @if (files().length) {
-                  <section class="uploaded-files" aria-labelledby="uploaded-files-title">
-                    <h3 id="uploaded-files-title">Uploaded files</h3>
-                    <ca-uploaded-file-list [files]="files()" (removeRequested)="removeFile($event)" />
-                  </section>
-                } @else {
-                  <div class="drop-hint">
-                    <span class="upload-icon" aria-hidden="true">↑</span>
-                    <strong>No file selected</strong>
-                    <span>Choose a PDF or image file to begin.</span>
-                  </div>
-                }
-
-                <div class="document-save-actions">
-                  <button mat-flat-button color="primary" type="button"
-                    (click)="saveDocument()" [disabled]="!files().length || saving()">
-                    {{ saving() ? 'Saving…' : 'Save Document' }}
-                  </button>
-                </div>
-
-                @if (ocrMessage(); as message) {
-                  <p class="feedback-message" role="status">{{ message }}</p>
-                }
-              </section>
-
-              @if (ocrResult(); as result) {
-                <div class="analysis-layout">
-                  <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
-                    (fileSelected)="selectPreview($event)" />
-                  <ca-ocr-response [result]="result" [documentIdControl]="documentIdControl"
-                    [confirmationMessage]="documentIdConfirmationMessage()"
-                    [documentIdConfirmed]="confirmedDocumentId() !== null"
-                    (confirmRequested)="confirmDocumentId()" />
-                </div>
-              } @else if (files().length) {
+              @if (ocrResult() && files().length) {
                 <div class="analysis-layout analysis-layout--preview-only">
                   <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
                     (fileSelected)="selectPreview($event)" />
                 </div>
               }
+
             }
           </div>
         }
