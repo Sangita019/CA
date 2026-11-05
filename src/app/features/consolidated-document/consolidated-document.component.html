@@ -84,18 +84,20 @@
                 <div class="analysis-layout">
                   <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
                     (fileSelected)="selectPreview($event)" />
-                  <ca-ocr-response
-                    [result]="result"
-                    [documentIdControl]="documentIdControl"
-                    [confirmationMessage]="documentIdConfirmationMessage()"
-                    [documentIdConfirmed]="confirmedDocumentId() !== null"
-                    (confirmRequested)="confirmDocumentId()" />
-                  @if (confirmedDocumentId()) {
-                    <button mat-flat-button color="primary" type="button"
-                      (click)="saveConfirmedDocument()" [disabled]="saving()">
-                      {{ saving() ? 'Saving…' : 'Save changes' }}
-                    </button>
-                  }
+                  <div class="ocr-response-column">
+                    <ca-ocr-response
+                      [result]="result"
+                      [documentIdControl]="documentIdControl"
+                      [confirmationMessage]="documentIdConfirmationMessage()"
+                      [documentIdConfirmed]="confirmedDocumentId() !== null"
+                      (confirmRequested)="confirmDocumentId()" />
+                    @if (confirmedDocumentId()) {
+                      <button mat-flat-button color="primary" type="button"
+                        (click)="saveConfirmedDocument()" [disabled]="saving()">
+                        {{ saving() ? 'Saving…' : 'Save changes' }}
+                      </button>
+                    }
+                  </div>
                 </div>
               }
 
