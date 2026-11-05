@@ -72,10 +72,9 @@
                 [document]="document"
                 [selected]="workflowSelected()"
                 [ocrCompleted]="ocrResult() !== null"
-                [documentIdentificationNumber]="documentIdentificationNumber()"
                 (selectionChange)="onWorkflowSelectionChange($event)"
                 (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
-                (saveChangesRequested)="saveWorkflowChanges($event)" />
+                />
 
               @if (ocrMessage(); as message) {
                 <p class="feedback-message" role="status">{{ message }}</p>
@@ -91,6 +90,12 @@
                     [confirmationMessage]="documentIdConfirmationMessage()"
                     [documentIdConfirmed]="confirmedDocumentId() !== null"
                     (confirmRequested)="confirmDocumentId()" />
+                  @if (confirmedDocumentId()) {
+                    <button mat-flat-button color="primary" type="button"
+                      (click)="saveConfirmedDocument()" [disabled]="saving()">
+                      {{ saving() ? 'Saving…' : 'Save changes' }}
+                    </button>
+                  }
                 </div>
               }
 
