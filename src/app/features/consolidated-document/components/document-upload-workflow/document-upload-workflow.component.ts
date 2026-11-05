@@ -48,8 +48,15 @@ export class DocumentUploadWorkflowComponent {
     this.uploads().length > 0 && this.uploads().every((file) => file.status === 'uploaded')
   );
   readonly isUploading = computed(() =>
-    this.uploads().some((file) => file.status === 'uploading' || file.status === 'queued')
+    this.uploads().some((file) => file.status === 'uploading')
   );
+  readonly pendingUploadCount = computed(() =>
+    this.uploads().filter((file) => file.status === 'queued' || file.status === 'failed').length
+  );
+  readonly uploadButtonLabel = computed(() => {
+    const count = this.pendingUploadCount();
+    return `Upload ${count} ${count === 1 ? 'file' : 'files'}`;
+  });
   readonly accept = DOCUMENT_UPLOAD_ACCEPT;
   private readonly uploader = inject(MockDocumentUploadService);
   private readonly destroyRef = inject(DestroyRef);
@@ -117,13 +124,22 @@ export class DocumentUploadWorkflowComponent {
       objectUrl: URL.createObjectURL(file),
       sourceFile: file,
       progress: 0,
-      status: 'uploading'
+      status: 'queued'
     }));
 
     this.uploads.set([...existingUploads, ...items]);
     this.validationMessage.set(null);
     this.filesChanged.emit();
-    items.forEach((item) => this.startUpload(item));
+  }
+
+  uploadSelectedFiles(): void {
+    const pendingItems = this.uploads().filter((item) =>
+      item.status === 'queued' || item.status === 'failed'
+    );
+    pendingItems.forEach((item) => {
+      this.updateUpload(item.id, { status: 'uploading', progress: 0 });
+      this.startUpload(item);
+    });
   }
 
   finalizeOcr(): void {
