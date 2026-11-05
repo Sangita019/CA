@@ -28,10 +28,9 @@ import {
 import { ConsolidatedDocumentMockService } from './services/consolidated-document-mock.service';
 import { DocumentFileStorageService } from './services/document-file-storage.service';
 import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
-import { UploadedFileListComponent } from './components/uploaded-file-list/uploaded-file-list.component';
-import { ApplicableDocumentSelectorComponent } from './components/applicable-document-selector/applicable-document-selector.component';
 import { DocumentPreviewComponent } from './components/document-preview/document-preview.component';
-import { OcrResponseComponent } from './components/ocr-response/ocr-response.component';
+import { DocumentUploadWorkflowComponent } from './components/document-upload-workflow/document-upload-workflow.component';
+import { DocumentUploadItem } from './components/document-upload-workflow/models/document-upload.models';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -72,13 +71,10 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   imports: [
     MatButtonModule,
     MatDialogModule,
-    MatChipsModule,
     MatExpansionModule,
     ReactiveFormsModule,
-    UploadedFileListComponent,
-    ApplicableDocumentSelectorComponent,
     DocumentPreviewComponent,
-    OcrResponseComponent
+    DocumentUploadWorkflowComponent
   ],
   templateUrl: './consolidated-document.component.html',
   styleUrl: './consolidated-document.component.scss',
@@ -91,6 +87,8 @@ export class ConsolidatedDocumentComponent {
   readonly documentIdConfirmed = output<string>();
 
   readonly selectedTabIndex = signal(0);
+  readonly workflowSelected = signal(false);
+  readonly documentIdentificationNumber = computed(() => this.ocrResult()?.documentId ?? '');
   readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
   readonly files = signal<readonly (UploadedDocumentFile & { sourceFile: File })[]>([]);
   readonly previewFileId = signal<string | null>(null);
@@ -190,6 +188,35 @@ export class ConsolidatedDocumentComponent {
       this.selectedDocumentId.set(documentId);
       this.documentStore.select(this.tabs()[this.selectedTabIndex()]?.id ?? '', documentId);
     });
+  }
+
+  onWorkflowSelectionChange(checked: boolean): void {
+    this.workflowSelected.set(checked);
+    if (!checked) {
+      this.ocrResult.set(null);
+      this.ocrMessage.set(null);
+      this.confirmedDocumentId.set(null);
+    }
+  }
+
+  finalizeWorkflowOcr(items: readonly DocumentUploadItem[]): void {
+    const workflowFiles = items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      type: item.type,
+      size: item.size,
+      objectUrl: item.objectUrl,
+      sourceFile: item.sourceFile
+    }));
+    this.files.set(workflowFiles);
+    this.previewFileId.set(workflowFiles[0]?.id ?? null);
+    this.triggerOcr();
+  }
+
+  saveWorkflowChanges(documentId: string): void {
+    this.documentIdControl.setValue(documentId);
+    this.confirmDocumentId();
+    void this.saveDocument();
   }
 
   private changeSelectionWithConfirmation(changeSelection: () => void): void {
@@ -578,6 +605,7 @@ export class ConsolidatedDocumentComponent {
   }
 
   private resetDocumentState(): void {
+    this.workflowSelected.set(false);
     this.revokeUrls(this.files());
     this.files.set([]);
     this.previewFileId.set(null);
