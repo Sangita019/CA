@@ -13,10 +13,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { ConsolidatedDocumentOption, UploadedDocumentFile } from '../../models/consolidated-document.models';
+import { ConsolidatedDocumentOption } from '../../models/consolidated-document.models';
 import {
   DOCUMENT_UPLOAD_ACCEPT,
   DOCUMENT_UPLOAD_LIMITS,
@@ -31,7 +30,6 @@ import { MockDocumentUploadService } from './services/mock-document-upload.servi
     MatButtonModule,
     MatCheckboxModule,
     MatProgressBarModule,
-    MatProgressSpinnerModule,
     ReactiveFormsModule
   ],
   templateUrl: './document-upload-workflow.component.html',
@@ -44,7 +42,7 @@ export class DocumentUploadWorkflowComponent {
   readonly ocrCompleted = input(false);
   readonly documentIdentificationNumber = input('');
   readonly selectionChange = output<boolean>();
-  readonly finalizeOcrRequested = output<readonly UploadedDocumentFile[]>();
+  readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
   readonly saveChangesRequested = output<string>();
 
   readonly uploads = signal<readonly DocumentUploadItem[]>([]);
@@ -126,13 +124,7 @@ export class DocumentUploadWorkflowComponent {
 
   finalizeOcr(): void {
     if (!this.uploadComplete()) return;
-    this.finalizeOcrRequested.emit(this.uploads().map((item) => ({
-      id: item.id,
-      name: item.name,
-      type: item.type,
-      size: item.size,
-      objectUrl: item.objectUrl
-    })));
+    this.finalizeOcrRequested.emit(this.uploads());
   }
 
   saveChanges(): void {
