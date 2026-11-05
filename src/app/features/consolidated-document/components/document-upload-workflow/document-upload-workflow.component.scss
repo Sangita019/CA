@@ -1,20 +1,18 @@
 :host { display: block; }
-.document-upload-workflow { display: grid; gap: 12px; }
-.upload-content { display: grid; gap: 14px; padding: 12px 0; }
+.document-upload-workflow { display: grid; gap: 10px; }
+.upload-content { display: grid; justify-items: start; gap: 12px; padding: 8px 0; }
 .upload-guidance { margin: 0; color: #5f6368; font-size: 13px; }
-.file-picker { display: inline-flex; width: fit-content; align-items: center; gap: 8px; cursor: pointer; }
-.file-picker span { padding: 9px 14px; border: 1px solid currentColor; border-radius: 4px; }
-.file-picker input { max-width: 230px; }
-.upload-list { display: grid; gap: 12px; }
-.upload-item { display: grid; gap: 6px; }
+.file-picker { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+.file-picker span { padding: 7px 12px; border: 1px solid currentColor; border-radius: 4px; font-size: 13px; }
+.file-picker input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+.file-picker:focus-within span { outline: 2px solid currentColor; outline-offset: 2px; }
+.upload-list { display: grid; width: 100%; gap: 10px; }
+.upload-item { display: grid; gap: 5px; }
 .upload-item__heading { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
 .file-name { overflow-wrap: anywhere; }
 .file-status { white-space: nowrap; font-weight: 600; }
 .validation-message { margin: 0; color: #b3261e; font-size: 13px; }
-.identification-section { display: grid; justify-items: start; gap: 10px; padding-top: 8px; }
-.identification-section input { width: min(100%, 360px); min-height: 38px; padding: 6px 9px; border: 1px solid #777; border-radius: 4px; font: inherit; }
+:host ::ng-deep button.mat-mdc-unelevated-button { min-width: 0; padding-inline: 14px; }
 @media (max-width: 600px) {
-  .file-picker { align-items: flex-start; flex-direction: column; }
-  .file-picker input { max-width: 100%; }
   .upload-item__heading { align-items: flex-start; flex-direction: column; gap: 3px; }
 }
