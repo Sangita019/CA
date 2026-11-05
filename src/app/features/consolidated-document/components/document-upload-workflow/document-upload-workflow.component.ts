@@ -54,8 +54,11 @@ export class DocumentUploadWorkflowComponent {
     this.uploads().filter((file) => file.status === 'queued' || file.status === 'failed').length
   );
   readonly uploadButtonLabel = computed(() => {
+    if (this.isUploading()) return 'Uploading…';
     const count = this.pendingUploadCount();
-    return `Upload ${count} ${count === 1 ? 'file' : 'files'}`;
+    return count > 0
+      ? `Upload ${count} ${count === 1 ? 'file' : 'files'}`
+      : 'Upload complete';
   });
   readonly accept = DOCUMENT_UPLOAD_ACCEPT;
   private readonly uploader = inject(MockDocumentUploadService);
