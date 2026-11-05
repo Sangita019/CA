@@ -9,10 +9,9 @@ import {
   signal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 
 import {
@@ -72,7 +71,6 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatButtonModule,
     MatDialogModule,
     MatExpansionModule,
-    ReactiveFormsModule,
     DocumentPreviewComponent,
     DocumentUploadWorkflowComponent
   ],
