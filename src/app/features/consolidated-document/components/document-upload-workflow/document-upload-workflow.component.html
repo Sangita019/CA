@@ -68,7 +68,6 @@
             id="document-identification-number"
             type="text"
             [formControl]="identificationControl"
-            [value]="documentIdentificationNumber()"
             maxlength="100" />
           @if (identificationControl.touched && identificationControl.invalid) {
             <p class="validation-message" role="alert">Enter a valid document identification number.</p>
