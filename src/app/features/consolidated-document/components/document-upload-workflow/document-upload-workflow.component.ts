@@ -39,6 +39,7 @@ export class DocumentUploadWorkflowComponent {
   readonly selected = input(false);
   readonly ocrCompleted = input(false);
   readonly selectionChange = output<boolean>();
+  readonly filesChanged = output<void>();
   readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
 
   readonly uploads = signal<readonly DocumentUploadItem[]>([]);
@@ -87,13 +88,28 @@ export class DocumentUploadWorkflowComponent {
       return;
     }
 
-    const validationError = this.validateFiles(selectedFiles);
+    const existingUploads = this.uploads();
+    const validationError = this.validateFiles([
+      ...existingUploads.map((item) => item.sourceFile),
+      ...selectedFiles
+    ]);
     if (validationError) {
       this.validationMessage.set(validationError);
       return;
     }
 
-    const items: DocumentUploadItem[] = selectedFiles.map((file, index) => ({
+    const existingKeys = new Set(existingUploads.map((item) =>
+      `${item.name}-${item.size}-${item.sourceFile.lastModified}`
+    ));
+    const newFiles = selectedFiles.filter((file) =>
+      !existingKeys.has(`${file.name}-${file.size}-${file.lastModified}`)
+    );
+    if (!newFiles.length) {
+      this.validationMessage.set('The selected file is already in the upload list.');
+      return;
+    }
+
+    const items: DocumentUploadItem[] = newFiles.map((file, index) => ({
       id: `${file.name}-${file.size}-${file.lastModified}-${index}`,
       name: file.name,
       type: this.isPdf(file) ? 'pdf' : 'image',
@@ -104,9 +120,9 @@ export class DocumentUploadWorkflowComponent {
       status: 'uploading'
     }));
 
-    this.clearUploads();
-    this.uploads.set(items);
+    this.uploads.set([...existingUploads, ...items]);
     this.validationMessage.set(null);
+    this.filesChanged.emit();
     items.forEach((item) => this.startUpload(item));
   }
 
