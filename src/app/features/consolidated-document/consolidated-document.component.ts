@@ -28,6 +28,7 @@ import { ConsolidatedDocumentMockService } from './services/consolidated-documen
 import { DocumentFileStorageService } from './services/document-file-storage.service';
 import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
 import { DocumentPreviewComponent } from './components/document-preview/document-preview.component';
+import { ApplicableDocumentSelectorComponent } from './components/applicable-document-selector/applicable-document-selector.component';
 import { DocumentUploadWorkflowComponent } from './components/document-upload-workflow/document-upload-workflow.component';
 import { DocumentUploadItem } from './components/document-upload-workflow/models/document-upload.models';
 
@@ -72,6 +73,7 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatDialogModule,
     MatExpansionModule,
     DocumentPreviewComponent,
+    ApplicableDocumentSelectorComponent,
     DocumentUploadWorkflowComponent
   ],
   templateUrl: './consolidated-document.component.html',
