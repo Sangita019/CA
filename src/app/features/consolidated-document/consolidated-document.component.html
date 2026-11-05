@@ -61,6 +61,12 @@
               </div>
             </div>
 
+            <ca-applicable-document-selector
+              [documents]="tab.documents"
+              [selectedDocumentId]="selectedDocumentId()"
+              [unavailableDocumentIds]="unavailableDocumentIds()"
+              (documentSelected)="selectDocument($event)" />
+
             @if (selectedDocument(); as document) {
               <ca-document-upload-workflow
                 [document]="document"
