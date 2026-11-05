@@ -11,8 +11,10 @@
 .upload-item__heading { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
 .file-name { overflow-wrap: anywhere; }
 .file-status { white-space: nowrap; font-weight: 600; }
-.validation-message { margin: 0; color: #b3261e; font-size: 13px; }
+.file-status--uploaded { color: #23784e; }
+.upload-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .finalize-button { width: fit-content; min-width: 0; padding-inline: 14px; }
+.validation-message { margin: 0; color: #b3261e; font-size: 13px; }
 @media (max-width: 600px) {
   .upload-item__heading { align-items: flex-start; flex-direction: column; gap: 3px; }
 }
