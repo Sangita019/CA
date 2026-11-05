@@ -8,7 +8,7 @@
   @if (selected()) {
     <div class="upload-content">
       <p class="upload-guidance">
-        Choose either one PDF or up to five images (JPEG, JPG, JFIF, PNG). Maximum 10 MB per file.
+        Up to 5 images and / or 1 PDF per document (JPEG, JPG, JFIF, PNG, PDF) · max 10 MB each
       </p>
 
       <label class="file-picker">
@@ -32,36 +32,49 @@
             <article class="upload-item">
               <div class="upload-item__heading">
                 <span class="file-name">{{ file.name }}</span>
-                <span class="file-status">
+                <span class="file-status" [class.file-status--uploaded]="file.status === 'uploaded'">
                   @if (file.status === 'uploaded') {
                     Uploaded
                   } @else if (file.status === 'failed') {
                     Upload failed
+                  } @else if (file.status === 'queued') {
+                    Selected · not uploaded
                   } @else {
                     {{ file.progress }}%
                   }
                 </span>
               </div>
-              <mat-progress-bar
-                mode="determinate"
-                [value]="file.progress"
-                [attr.aria-label]="'Upload progress for ' + file.name"
-                [color]="file.status === 'failed' ? 'warn' : 'primary'" />
+              @if (file.status === 'uploading') {
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="file.progress"
+                  [attr.aria-label]="'Upload progress for ' + file.name"
+                  color="primary" />
+              }
             </article>
           }
         </div>
+
+        <div class="upload-actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            (click)="uploadSelectedFiles()"
+            [disabled]="pendingUploadCount() === 0 || isUploading()">
+            {{ uploadButtonLabel() }}
+          </button>
+          <button
+            class="finalize-button"
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="finalizeOcr()"
+            [disabled]="!uploadComplete() || ocrCompleted()">
+            Finalize OCR
+          </button>
+        </div>
       }
-
-      <button
-        class="finalize-button"
-        mat-flat-button
-        color="primary"
-        type="button"
-        (click)="finalizeOcr()"
-        [disabled]="!uploadComplete() || isUploading() || ocrCompleted()">
-        Finalize OCR
-      </button>
-
     </div>
   }
 </section>
