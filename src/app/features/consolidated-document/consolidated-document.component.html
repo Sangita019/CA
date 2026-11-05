@@ -85,20 +85,39 @@
                 <div class="analysis-layout">
                   <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
                     (fileSelected)="selectPreview($event)" />
-                  <div class="ocr-response-column">
-                    <ca-ocr-response
-                      [result]="result"
-                      [documentIdControl]="documentIdControl"
-                      [confirmationMessage]="documentIdConfirmationMessage()"
-                      [documentIdConfirmed]="confirmedDocumentId() !== null"
-                      (confirmRequested)="confirmDocumentId()" />
-                    @if (confirmedDocumentId()) {
+                  <section class="document-identification" aria-labelledby="document-identification-title">
+                    <h3 id="document-identification-title">Document identification number</h3>
+                    <div class="document-identification__fields">
+                      <label>
+                        <span>Identifier</span>
+                        <select [value]="document.label" disabled aria-label="Document identifier">
+                          <option [value]="document.label">{{ document.label }}</option>
+                        </select>
+                      </label>
+                      <label class="document-identification__value">
+                        <span>Extracted value (editable)</span>
+                        <input
+                          type="text"
+                          [value]="documentIdControl.value"
+                          (input)="updateDocumentIdentificationNumber($event)"
+                          aria-label="Extracted document identification number" />
+                      </label>
+                      <div class="document-identification__confidence">
+                        <span>OCR confidence</span>
+                        <strong>Not provided by mock OCR</strong>
+                      </div>
+                    </div>
+                    <p class="document-identification__hint">
+                      Used for CRIF and other eligibility checks — correct the value here if the OCR reading is wrong.
+                    </p>
+                    <div class="document-identification__actions">
                       <button mat-flat-button color="primary" type="button"
-                        (click)="saveConfirmedDocument()" [disabled]="saving()">
+                        (click)="saveWorkflowChanges(documentIdControl.value)"
+                        [disabled]="saving() || !documentIdControl.value.trim()">
                         {{ saving() ? 'Saving…' : 'Save changes' }}
                       </button>
-                    }
-                  </div>
+                    </div>
+                  </section>
                 </div>
               }
 
