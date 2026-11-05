@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   computed,
+  effect,
   inject,
   input,
   output,
@@ -62,6 +63,12 @@ export class DocumentUploadWorkflowComponent {
   readonly accept = DOCUMENT_UPLOAD_ACCEPT;
   private readonly uploader = inject(MockDocumentUploadService);
   private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    effect(() => {
+      this.identificationControl.setValue(this.documentIdentificationNumber(), { emitEvent: false });
+    });
+  }
 
   onDocumentChecked(checked: boolean): void {
     this.validationMessage.set(null);
