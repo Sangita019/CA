@@ -1,0 +1,88 @@
+<section class="document-upload-workflow" aria-label="Document upload workflow">
+  <mat-checkbox
+    [checked]="selected()"
+    (change)="onDocumentChecked($event.checked)">
+    {{ document().label }} applies to this category
+  </mat-checkbox>
+
+  @if (selected()) {
+    <div class="upload-content">
+      <p class="upload-guidance">
+        Choose either one PDF or up to five images (JPEG, JPG, JFIF, PNG). Maximum 10 MB per file.
+      </p>
+
+      <label class="file-picker">
+        <span>Choose file(s)</span>
+        <input
+          type="file"
+          multiple
+          [accept]="accept"
+          [disabled]="isUploading()"
+          (change)="onFilesSelected($event)"
+          aria-label="Choose document files" />
+      </label>
+
+      @if (validationMessage(); as message) {
+        <p class="validation-message" role="alert">{{ message }}</p>
+      }
+
+      @if (uploads().length) {
+        <div class="upload-list" aria-live="polite">
+          @for (file of uploads(); track file.id) {
+            <article class="upload-item">
+              <div class="upload-item__heading">
+                <span class="file-name">{{ file.name }}</span>
+                <span class="file-status">
+                  @if (file.status === 'uploaded') {
+                    Uploaded
+                  } @else if (file.status === 'failed') {
+                    Upload failed
+                  } @else {
+                    {{ file.progress }}%
+                  }
+                </span>
+              </div>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="file.progress"
+                [attr.aria-label]="'Upload progress for ' + file.name"
+                [color]="file.status === 'failed' ? 'warn' : 'primary'" />
+            </article>
+          }
+        </div>
+      }
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="finalizeOcr()"
+        [disabled]="!uploadComplete() || isUploading() || ocrCompleted()">
+        Finalize OCR
+      </button>
+
+      @if (ocrCompleted()) {
+        <div class="identification-section">
+          <label for="document-identification-number">Document identification number</label>
+          <input
+            id="document-identification-number"
+            type="text"
+            [formControl]="identificationControl"
+            [value]="documentIdentificationNumber()"
+            maxlength="100" />
+          @if (identificationControl.touched && identificationControl.invalid) {
+            <p class="validation-message" role="alert">Enter a valid document identification number.</p>
+          }
+          <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="saveChanges()"
+            [disabled]="identificationControl.invalid">
+            Save changes
+          </button>
+        </div>
+      }
+    </div>
+  }
+</section>
