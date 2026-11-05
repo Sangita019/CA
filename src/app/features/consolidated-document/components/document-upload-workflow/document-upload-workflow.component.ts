@@ -7,7 +7,8 @@ import {
   inject,
   input,
   output,
-  signal
+  signal,
+  untracked
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -78,7 +79,7 @@ export class DocumentUploadWorkflowComponent {
     });
     effect(() => {
       const restored = this.restoredUploads();
-      this.clearUploads();
+      untracked(() => this.clearUploads());
       this.uploads.set(restored);
     });
     this.destroyRef.onDestroy(() => this.clearUploads());
