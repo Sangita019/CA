@@ -139,7 +139,8 @@ export class ConsolidatedDocumentComponent {
       document.id === this.selectedDocumentId() && this.tabs()[this.selectedTabIndex()]?.id === tab.id
     );
     const saved = this.documentStore.records().find((record) =>
-      record.tabId === tab.id && record.status === 'saved'
+      record.tabId === tab.id &&
+      (record.status === 'uploaded' || record.status === 'saved')
     );
     return selected?.label ?? saved?.documentLabel ?? 'No document selected';
   }
@@ -149,6 +150,9 @@ export class ConsolidatedDocumentComponent {
     if (index === this.selectedTabIndex() && this.ocrResult()) return 'OCR Complete';
     if (this.documentStore.records().some((record) => record.tabId === tab.id && record.status === 'saved')) {
       return 'Saved';
+    }
+    if (this.documentStore.records().some((record) => record.tabId === tab.id && record.status === 'uploaded')) {
+      return 'Document Saved';
     }
     if (index === this.selectedTabIndex() && this.files().length) return 'Files Selected';
     return 'Not Started';
