@@ -192,7 +192,6 @@ export class ConsolidatedDocumentComponent {
 
   onWorkflowFilesChanged(): void {
     this.files.set([]);
-    this.restoredUploads.set([]);
     this.previewFileId.set(null);
     this.ocrResult.set(null);
     this.confirmedDocumentId.set(null);
@@ -225,7 +224,6 @@ export class ConsolidatedDocumentComponent {
       sourceFile: item.sourceFile
     }));
     this.files.set(workflowFiles);
-    this.restoredUploads.set([]);
     this.previewFileId.set(workflowFiles[0]?.id ?? null);
     this.triggerOcr();
   }
