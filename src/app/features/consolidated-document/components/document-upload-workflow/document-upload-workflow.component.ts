@@ -38,6 +38,7 @@ export class DocumentUploadWorkflowComponent {
   readonly document = input.required<ConsolidatedDocumentOption>();
   readonly selected = input(false);
   readonly ocrCompleted = input(false);
+  readonly restoredUploads = input<readonly DocumentUploadItem[]>([]);
   readonly selectionChange = output<boolean>();
   readonly filesChanged = output<void>();
   readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
@@ -74,6 +75,11 @@ export class DocumentUploadWorkflowComponent {
         this.validationMessage.set(null);
       }
       this.currentDocumentId = documentId;
+    });
+    effect(() => {
+      const restored = this.restoredUploads();
+      this.clearUploads();
+      this.uploads.set(restored);
     });
     this.destroyRef.onDestroy(() => this.clearUploads());
   }
