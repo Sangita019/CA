@@ -192,7 +192,6 @@ export class ConsolidatedDocumentComponent {
   }
 
   onWorkflowFilesChanged(): void {
-    this.revokeUrls(this.files());
     this.files.set([]);
     this.previewFileId.set(null);
     this.ocrResult.set(null);
