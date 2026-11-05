@@ -90,7 +90,6 @@ export class ConsolidatedDocumentComponent {
 
   readonly selectedTabIndex = signal(0);
   readonly workflowSelected = signal(false);
-  readonly documentIdentificationNumber = computed(() => this.ocrResult()?.documentId ?? '');
   readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
   readonly files = signal<readonly (UploadedDocumentFile & { sourceFile: File })[]>([]);
   readonly previewFileId = signal<string | null>(null);
@@ -190,6 +189,18 @@ export class ConsolidatedDocumentComponent {
       this.selectedDocumentId.set(documentId);
       this.documentStore.select(this.tabs()[this.selectedTabIndex()]?.id ?? '', documentId);
     });
+  }
+
+  onWorkflowFilesChanged(): void {
+    this.revokeUrls(this.files());
+    this.files.set([]);
+    this.previewFileId.set(null);
+    this.ocrResult.set(null);
+    this.confirmedDocumentId.set(null);
+    this.documentIdControl.reset();
+    this.ocrMessage.set(null);
+    this.documentIdConfirmationMessage.set(null);
+    this.saveMessage.set(null);
   }
 
   onWorkflowSelectionChange(checked: boolean): void {
