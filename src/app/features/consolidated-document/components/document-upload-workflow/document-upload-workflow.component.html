@@ -11,16 +11,24 @@
         Up to 5 images and / or 1 PDF per document (JPEG, JPG, JFIF, PNG, PDF) · max 10 MB each
       </p>
 
-      <label class="file-picker">
-        <span>Add more files</span>
-        <input
-          type="file"
-          multiple
-          [accept]="accept"
-          [disabled]="isUploading()"
-          (change)="onFilesSelected($event)"
-          aria-label="Add document files" />
-      </label>
+      <input
+        #fileInput
+        class="native-file-input"
+        type="file"
+        multiple
+        [accept]="accept"
+        [disabled]="isUploading()"
+        (change)="onFilesSelected($event)"
+        aria-label="Add document files" />
+      <button
+        mat-stroked-button
+        color="primary"
+        type="button"
+        class="add-files-button"
+        [disabled]="isUploading()"
+        (click)="fileInput.click()">
+        Add more files
+      </button>
 
       @if (validationMessage(); as message) {
         <p class="validation-message" role="alert">{{ message }}</p>
