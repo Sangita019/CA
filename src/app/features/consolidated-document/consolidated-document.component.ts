@@ -90,6 +90,7 @@ export class ConsolidatedDocumentComponent {
   readonly workflowSelected = signal(false);
   readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
   readonly files = signal<readonly (UploadedDocumentFile & { sourceFile: File })[]>([]);
+  readonly restoredUploads = signal<readonly DocumentUploadItem[]>([]);
   readonly previewFileId = signal<string | null>(null);
   readonly ocrResult = signal<OcrResult | null>(null);
   readonly ocrLoading = signal(false);
@@ -191,6 +192,7 @@ export class ConsolidatedDocumentComponent {
 
   onWorkflowFilesChanged(): void {
     this.files.set([]);
+    this.restoredUploads.set([]);
     this.previewFileId.set(null);
     this.ocrResult.set(null);
     this.confirmedDocumentId.set(null);
@@ -205,6 +207,7 @@ export class ConsolidatedDocumentComponent {
     if (!checked) {
       this.revokeUrls(this.files());
       this.files.set([]);
+      this.restoredUploads.set([]);
       this.previewFileId.set(null);
       this.ocrResult.set(null);
       this.ocrMessage.set(null);
@@ -222,6 +225,7 @@ export class ConsolidatedDocumentComponent {
       sourceFile: item.sourceFile
     }));
     this.files.set(workflowFiles);
+    this.restoredUploads.set([]);
     this.previewFileId.set(workflowFiles[0]?.id ?? null);
     this.triggerOcr();
   }
@@ -611,6 +615,14 @@ export class ConsolidatedDocumentComponent {
         };
       });
       this.files.set(restored);
+      this.restoredUploads.set(restored.map((file) => ({
+        ...file,
+        progress: 100,
+        status: 'uploaded' as const
+      })));
+      this.workflowSelected.set(true);
+      this.confirmedDocumentId.set(bundle.confirmedDocumentId);
+      this.documentIdControl.setValue(bundle.confirmedDocumentId ?? '');
       this.previewFileId.set(restored[0]?.id ?? null);
     } catch {
       this.saveMessage.set('Previously saved files could not be loaded from browser storage.');
@@ -630,6 +642,7 @@ export class ConsolidatedDocumentComponent {
     this.workflowSelected.set(false);
     this.revokeUrls(this.files());
     this.files.set([]);
+    this.restoredUploads.set([]);
     this.previewFileId.set(null);
     this.ocrResult.set(null);
     this.documentIdControl.reset();
