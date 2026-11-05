@@ -72,6 +72,7 @@
                 [document]="document"
                 [selected]="workflowSelected()"
                 [ocrCompleted]="ocrResult() !== null"
+                [restoredUploads]="restoredUploads()"
                 (selectionChange)="onWorkflowSelectionChange($event)"
                 (filesChanged)="onWorkflowFilesChanged()"
                 (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
@@ -81,7 +82,7 @@
                 <p class="feedback-message" role="status">{{ message }}</p>
               }
 
-              @if (ocrResult(); as result) {
+              @if (ocrResult() || confirmedDocumentId()) {
                 <div class="analysis-layout">
                   <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
                     (fileSelected)="selectPreview($event)" />
@@ -90,9 +91,7 @@
                     <div class="document-identification__fields">
                       <label>
                         <span>Identifier</span>
-                        <select [value]="document.label" disabled aria-label="Document identifier">
-                          <option [value]="document.label">{{ document.label }}</option>
-                        </select>
+                        <input type="text" [value]="document.label" readonly aria-label="Document identifier" />
                       </label>
                       <label class="document-identification__value">
                         <span>Extracted value (editable)</span>
