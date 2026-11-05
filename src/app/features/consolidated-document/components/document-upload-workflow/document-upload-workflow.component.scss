@@ -2,10 +2,8 @@
 .document-upload-workflow { display: grid; gap: 10px; }
 .upload-content { display: grid; justify-items: start; gap: 12px; padding: 8px 0; }
 .upload-guidance { margin: 0; color: #5f6368; font-size: 13px; }
-.file-picker { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
-.file-picker span { padding: 7px 12px; border: 1px solid currentColor; border-radius: 4px; font-size: 13px; }
-.file-picker input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
-.file-picker:focus-within span { outline: 2px solid currentColor; outline-offset: 2px; }
+.native-file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap; }
+.add-files-button { width: fit-content; min-width: 0; }
 .upload-list { display: grid; width: 100%; gap: 10px; }
 .upload-item { display: grid; gap: 5px; }
 .upload-item__heading { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
