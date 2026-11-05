@@ -63,15 +63,30 @@ export class DocumentUploadWorkflowComponent {
   readonly accept = DOCUMENT_UPLOAD_ACCEPT;
   private readonly uploader = inject(MockDocumentUploadService);
   private readonly destroyRef = inject(DestroyRef);
+  private currentDocumentId: string | null = null;
 
   constructor() {
     effect(() => {
       this.identificationControl.setValue(this.documentIdentificationNumber(), { emitEvent: false });
     });
+    effect(() => {
+      const documentId = this.document().id;
+      if (this.currentDocumentId !== null && this.currentDocumentId !== documentId) {
+        this.clearUploads();
+        this.uploads.set([]);
+        this.validationMessage.set(null);
+      }
+      this.currentDocumentId = documentId;
+    });
+    this.destroyRef.onDestroy(() => this.clearUploads());
   }
 
   onDocumentChecked(checked: boolean): void {
     this.validationMessage.set(null);
+    if (!checked) {
+      this.clearUploads();
+      this.uploads.set([]);
+    }
     this.selectionChange.emit(checked);
   }
 
