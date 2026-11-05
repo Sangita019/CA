@@ -218,9 +218,11 @@ export class ConsolidatedDocumentComponent {
     this.triggerOcr();
   }
 
-  saveWorkflowChanges(documentId: string): void {
-    this.documentIdControl.setValue(documentId);
-    this.confirmDocumentId();
+  saveConfirmedDocument(): void {
+    if (!this.confirmedDocumentId()) {
+      this.saveMessage.set('Confirm the document ID before saving changes.');
+      return;
+    }
     void this.saveDocument();
   }
 
