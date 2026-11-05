@@ -13,7 +13,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ConsolidatedDocumentOption } from '../../models/consolidated-document.models';
 import {
@@ -30,7 +29,6 @@ import { MockDocumentUploadService } from './services/mock-document-upload.servi
     MatButtonModule,
     MatCheckboxModule,
     MatProgressBarModule,
-    ReactiveFormsModule
   ],
   templateUrl: './document-upload-workflow.component.html',
   styleUrl: './document-upload-workflow.component.scss',
@@ -40,10 +38,8 @@ export class DocumentUploadWorkflowComponent {
   readonly document = input.required<ConsolidatedDocumentOption>();
   readonly selected = input(false);
   readonly ocrCompleted = input(false);
-  readonly documentIdentificationNumber = input('');
   readonly selectionChange = output<boolean>();
   readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
-  readonly saveChangesRequested = output<string>();
 
   readonly uploads = signal<readonly DocumentUploadItem[]>([]);
   readonly validationMessage = signal<string | null>(null);
@@ -53,20 +49,12 @@ export class DocumentUploadWorkflowComponent {
   readonly isUploading = computed(() =>
     this.uploads().some((file) => file.status === 'uploading' || file.status === 'queued')
   );
-  readonly identificationControl = new FormControl('', {
-    nonNullable: true,
-    validators: [Validators.required, Validators.maxLength(100)]
-  });
-
   readonly accept = DOCUMENT_UPLOAD_ACCEPT;
   private readonly uploader = inject(MockDocumentUploadService);
   private readonly destroyRef = inject(DestroyRef);
   private currentDocumentId: string | null = null;
 
   constructor() {
-    effect(() => {
-      this.identificationControl.setValue(this.documentIdentificationNumber(), { emitEvent: false });
-    });
     effect(() => {
       const documentId = this.document().id;
       if (this.currentDocumentId !== null && this.currentDocumentId !== documentId) {
@@ -125,15 +113,6 @@ export class DocumentUploadWorkflowComponent {
   finalizeOcr(): void {
     if (!this.uploadComplete()) return;
     this.finalizeOcrRequested.emit(this.uploads());
-  }
-
-  saveChanges(): void {
-    const identificationNumber = this.identificationControl.value.trim();
-    if (!this.ocrCompleted() || !identificationNumber || this.identificationControl.invalid) {
-      this.identificationControl.markAsTouched();
-      return;
-    }
-    this.saveChangesRequested.emit(identificationNumber);
   }
 
   private startUpload(item: DocumentUploadItem): void {
