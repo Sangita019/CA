@@ -1,6 +1,7 @@
 @use './consolidated-document-panels';
 @use './consolidated-document-header';
 @use './consolidated-document-summary';
+@use './document-identification-section';
 :host { display: block; min-width: 0; color: #243247; }
 .screen { box-sizing: border-box; min-width: 0; padding: 20px 24px; background: #f7f9fc; }
 
