@@ -33,3 +33,6 @@
 @media (max-width: 480px) { .section-heading { align-items: flex-start; flex-direction: column; } .selected-summary { gap: 7px; } .upload-controls button { flex: 1 1 auto; } .category-panel mat-panel-description { margin-right: 0; } }
 
 .document-save-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+.analysis-layout .ocr-response-column { display: grid; justify-items: start; gap: 10px; min-width: 0; }
+.analysis-layout .ocr-response-column button { width: fit-content; min-width: 0; }
