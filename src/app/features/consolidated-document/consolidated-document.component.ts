@@ -227,11 +227,17 @@ export class ConsolidatedDocumentComponent {
   }
 
   saveWorkflowChanges(documentId: string): void {
-    this.documentIdControl.setValue(documentId);
+    this.documentIdControl.setValue(documentId.trim());
     this.confirmDocumentId();
     if (this.confirmedDocumentId()) {
       void this.saveDocument();
     }
+  }
+
+  updateDocumentIdentificationNumber(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    this.documentIdControl.setValue(inputElement.value);
+    this.confirmedDocumentId.set(null);
   }
 
   private changeSelectionWithConfirmation(changeSelection: () => void): void {
@@ -458,6 +464,7 @@ export class ConsolidatedDocumentComponent {
   setOcrResult(result: OcrResult): void {
     this.ocrResult.set(result);
     this.documentIdControl.setValue(result.documentId);
+    this.confirmedDocumentId.set(null);
     this.ocrLoading.set(false);
   }
 
