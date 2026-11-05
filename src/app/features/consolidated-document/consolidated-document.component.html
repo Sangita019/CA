@@ -81,10 +81,16 @@
                 <p class="feedback-message" role="status">{{ message }}</p>
               }
 
-              @if (ocrResult() && files().length) {
-                <div class="analysis-layout analysis-layout--preview-only">
+              @if (ocrResult(); as result) {
+                <div class="analysis-layout">
                   <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
                     (fileSelected)="selectPreview($event)" />
+                  <ca-ocr-response
+                    [result]="result"
+                    [documentIdControl]="documentIdControl"
+                    [confirmationMessage]="documentIdConfirmationMessage()"
+                    [documentIdConfirmed]="confirmedDocumentId() !== null"
+                    (confirmRequested)="confirmDocumentId()" />
                 </div>
               }
 
