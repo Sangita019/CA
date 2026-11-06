@@ -20,11 +20,12 @@
         [attr.aria-label]="'Open ' + tab.label + ' category. ' + categoryStatus(tab, index)"
         (click)="selectTab(index)">
         <span>{{ tab.label }}</span>
-        @if (categorySaved(tab)) {
-          <span class="summary-chip__status">Saved</span>
-        } @else if (categoryDocumentLabel(tab) !== 'No document selected') {
+        @if (categoryDocumentLabel(tab) !== 'No document selected') {
           <span class="summary-chip__document">{{ categoryDocumentLabel(tab) }}</span>
         }
+        <ca-document-status-chip
+          [label]="categoryStatus(tab, index)"
+          [tone]="categoryStatusTone(tab, index)" />
       </button>
     }
     <span class="summary-note">Select one document per category</span>
@@ -45,10 +46,12 @@
             </span>
           </mat-panel-title>
           <mat-panel-description>
-            <span class="section-status"
-              [class.section-status--complete]="categoryStatus(tab, index) === 'Saved'">
-              {{ categoryStatus(tab, index) }}
-            </span>
+            @if (selectedTabIndex() === index && selectedDocument()?.required) {
+              <ca-document-status-chip label="Mandatory" tone="neutral" />
+            }
+            <ca-document-status-chip
+              [label]="categoryStatus(tab, index)"
+              [tone]="categoryStatusTone(tab, index)" />
           </mat-panel-description>
         </mat-expansion-panel-header>
 
