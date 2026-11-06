@@ -16,6 +16,7 @@ export class ApplicableDocumentSelectorComponent {
   readonly documents = input.required<readonly ConsolidatedDocumentOption[]>();
   readonly selectedDocumentId = input<string | null>(null);
   readonly unavailableDocumentIds = input<ReadonlySet<string>>(new Set<string>());
+  readonly unavailableDocumentMessages = input<ReadonlyMap<string, string>>(new Map<string, string>());
   readonly documentSelected = output<string>();
 
   onDocumentChange(documentId: string, group: MatRadioGroup): void {
