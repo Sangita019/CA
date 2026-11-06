@@ -70,10 +70,8 @@
             @if (selectedDocument(); as document) {
               <ca-document-upload-workflow
                 [document]="document"
-                [selected]="workflowSelected()"
                 [ocrCompleted]="ocrResult() !== null"
                 [restoredUploads]="restoredUploads()"
-                (selectionChange)="onWorkflowSelectionChange($event)"
                 (filesChanged)="onWorkflowFilesChanged()"
                 (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
                 />
