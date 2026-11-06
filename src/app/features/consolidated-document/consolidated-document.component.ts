@@ -242,11 +242,15 @@ export class ConsolidatedDocumentComponent {
 
     const tab = this.tabs()[this.selectedTabIndex()];
     const document = this.selectedDocument();
+    if (tab) {
+      // File changes invalidate the previous saved/complete state for this category.
+      this.documentStore.clearTab(tab.id);
+    }
+
     if (!selectedFiles.length) {
       const records = tab
         ? this.documentStore.records().filter((record) => record.tabId === tab.id)
         : [];
-      if (tab) this.documentStore.clearTab(tab.id);
       const documentIds = new Set([
         ...(document ? [document.id] : []),
         ...records.map((record) => record.documentId)
