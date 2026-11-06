@@ -40,6 +40,7 @@ export class DocumentUploadWorkflowComponent {
   readonly ocrCompleted = input(false);
   readonly restoredUploads = input<readonly DocumentUploadItem[]>([]);
   readonly filesChanged = output<void>();
+  readonly uploadStateChange = output<'selected' | 'uploading' | 'uploaded'>();
   readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
 
   readonly uploadForm = new FormGroup({
@@ -74,6 +75,7 @@ export class DocumentUploadWorkflowComponent {
       if (this.currentDocumentId !== null && this.currentDocumentId !== documentId) {
         this.clearUploads();
         this.uploads.set([]);
+        this.uploadForm.controls.files.setValue([]);
         this.validationMessage.set(null);
       }
       this.currentDocumentId = documentId;
@@ -82,6 +84,9 @@ export class DocumentUploadWorkflowComponent {
       const restored = this.restoredUploads();
       untracked(() => this.clearUploads());
       this.uploads.set(restored);
+      if (restored.length && restored.every((file) => file.status === 'uploaded')) {
+        this.uploadStateChange.emit('uploaded');
+      }
     });
     this.destroyRef.onDestroy(() => this.clearUploads());
   }
@@ -137,12 +142,14 @@ export class DocumentUploadWorkflowComponent {
     this.uploadForm.controls.files.setValue([...existingUploads, ...items].map((item) => item.sourceFile));
     this.validationMessage.set(null);
     this.filesChanged.emit();
+    this.uploadStateChange.emit('selected');
   }
 
   uploadSelectedFiles(): void {
     const pendingItems = this.uploads().filter((item) =>
       item.status === 'queued' || item.status === 'failed'
     );
+    if (pendingItems.length) this.uploadStateChange.emit('uploading');
     pendingItems.forEach((item) => {
       this.updateUpload(item.id, { status: 'uploading', progress: 0 });
       this.startUpload(item);
@@ -158,10 +165,15 @@ export class DocumentUploadWorkflowComponent {
     this.uploader.upload(item.sourceFile)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (progress) => this.updateUpload(item.id, {
-          progress,
-          status: progress === 100 ? 'uploaded' : 'uploading'
-        }),
+        next: (progress) => {
+          this.updateUpload(item.id, {
+            progress,
+            status: progress === 100 ? 'uploaded' : 'uploading'
+          });
+          if (progress === 100 && this.uploads().every((file) => file.status === 'uploaded')) {
+            this.uploadStateChange.emit('uploaded');
+          }
+        },
         error: () => this.updateUpload(item.id, { status: 'failed' })
       });
   }
