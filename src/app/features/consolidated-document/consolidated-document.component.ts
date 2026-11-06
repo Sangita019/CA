@@ -226,11 +226,11 @@ export class ConsolidatedDocumentComponent {
   }
 
   onWorkflowFilesChanged(items: readonly DocumentUploadItem[]): void {
-    this.uploadStage.set('selected');
     const selectedFiles = items.map((item) => ({
       id: item.id, name: item.name, type: item.type, size: item.size,
       objectUrl: item.objectUrl, sourceFile: item.sourceFile
     }));
+    this.uploadStage.set(selectedFiles.length ? 'selected' : 'none');
     this.files.set(selectedFiles);
     this.previewFileId.set(selectedFiles[0]?.id ?? null);
     this.ocrResult.set(null);
@@ -239,6 +239,26 @@ export class ConsolidatedDocumentComponent {
     this.ocrMessage.set(null);
     this.documentIdConfirmationMessage.set(null);
     this.saveMessage.set(null);
+
+    const tab = this.tabs()[this.selectedTabIndex()];
+    const document = this.selectedDocument();
+    if (!selectedFiles.length) {
+      const records = tab
+        ? this.documentStore.records().filter((record) => record.tabId === tab.id)
+        : [];
+      if (tab) this.documentStore.clearTab(tab.id);
+      const documentIds = new Set([
+        ...(document ? [document.id] : []),
+        ...records.map((record) => record.documentId)
+      ]);
+      void Promise.all(Array.from(documentIds, (documentId) =>
+        this.fileStorage.deleteBundle(documentId, tab?.id ?? '')
+      )).catch(() => {
+        this.saveMessage.set('Files were removed from this view, but saved browser data could not be fully cleared.');
+      });
+      return;
+    }
+
     void this.persistDraftBundle(selectedFiles);
   }
 
