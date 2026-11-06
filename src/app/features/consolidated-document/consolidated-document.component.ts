@@ -121,12 +121,33 @@ export class ConsolidatedDocumentComponent {
     return tab?.documents.find((document) => document.id === this.selectedDocumentId()) ?? null;
   });
 
-  readonly unavailableDocumentIds = computed<ReadonlySet<string>>(() => {
-    const tab = this.tabs()[this.selectedTabIndex()];
-    return new Set((tab?.documents ?? [])
-      .filter((document) => tab && this.documentStore.isUnavailableInTab(document, tab.id))
-      .map((document) => document.id));
+  readonly unavailableDocumentMessages = computed<ReadonlyMap<string, string>>(() => {
+    const activeTab = this.tabs()[this.selectedTabIndex()];
+    const messages = new Map<string, string>();
+    if (!activeTab) return messages;
+
+    for (const document of activeTab.documents) {
+      const existingRecord = this.documentStore.records().find((record) =>
+        record.documentId === document.id &&
+        record.tabId !== activeTab.id &&
+        (record.status === 'uploaded' || record.status === 'saved')
+      );
+      if (!existingRecord) continue;
+
+      const existingTab = this.tabs().find((tab) => tab.id === existingRecord.tabId);
+      messages.set(
+        document.id,
+        existingTab
+          ? `Already uploaded in ${existingTab.label}`
+          : 'Already uploaded in another category'
+      );
+    }
+    return messages;
   });
+
+  readonly unavailableDocumentIds = computed<ReadonlySet<string>>(() =>
+    new Set(this.unavailableDocumentMessages().keys())
+  );
 
   categorySaved(tab: ConsolidatedDocumentTab): boolean {
     return this.documentStore.records().some((record) =>
