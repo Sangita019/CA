@@ -1,18 +1,26 @@
-:host { display: block; }
-.document-upload-workflow { display: grid; gap: 10px; }
-.upload-content { display: grid; justify-items: start; gap: 12px; padding: 8px 0; }
+:host { display: block; min-width: 0; }
+.document-upload-workflow { display: block; }
+.upload-layout { display: grid; grid-template-columns: minmax(280px, .9fr) minmax(320px, 1.1fr); gap: 18px; align-items: start; }
+.upload-content { display: grid; justify-items: start; gap: 12px; padding: 8px 0; min-width: 0; }
 .upload-guidance { margin: 0; color: #5f6368; font-size: 13px; }
 .native-file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap; }
 .add-files-button { width: fit-content; min-width: 0; }
 .upload-list { display: grid; width: 100%; gap: 10px; }
-.upload-item { display: grid; gap: 5px; }
+.upload-item { display: grid; gap: 5px; padding-bottom: 8px; border-bottom: 1px solid #e5eaf0; }
 .upload-item__heading { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
 .file-name { overflow-wrap: anywhere; }
 .file-status { white-space: nowrap; font-weight: 600; }
 .file-status--uploaded { color: #23784e; }
+.file-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.file-actions button { min-width: 0; padding-inline: 8px; font-size: 12px; }
 .upload-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .finalize-button { width: fit-content; min-width: 0; padding-inline: 14px; }
+.upload-preview { min-width: 0; min-height: 260px; }
 .validation-message { margin: 0; color: #b3261e; font-size: 13px; }
+@media (max-width: 760px) {
+  .upload-layout { grid-template-columns: minmax(0, 1fr); }
+  .upload-preview { width: 100%; }
+}
 @media (max-width: 600px) {
   .upload-item__heading { align-items: flex-start; flex-direction: column; gap: 3px; }
 }
