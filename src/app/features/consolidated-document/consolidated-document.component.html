@@ -43,9 +43,6 @@
             </span>
           </mat-panel-title>
           <mat-panel-description>
-            @if (selectedTabIndex() === index && selectedDocument()?.required) {
-              <ca-document-status-chip label="Mandatory" tone="neutral" />
-            }
             <ca-document-status-chip
               [label]="categoryStatus(tab, index)"
               [tone]="categoryStatusTone(tab, index)" />
