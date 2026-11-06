@@ -195,16 +195,21 @@ export class ConsolidatedDocumentComponent {
     });
   }
 
-  onWorkflowFilesChanged(): void {
+  onWorkflowFilesChanged(items: readonly DocumentUploadItem[]): void {
     this.uploadStage.set('selected');
-    this.files.set([]);
-    this.previewFileId.set(null);
+    const selectedFiles = items.map((item) => ({
+      id: item.id, name: item.name, type: item.type, size: item.size,
+      objectUrl: item.objectUrl, sourceFile: item.sourceFile
+    }));
+    this.files.set(selectedFiles);
+    this.previewFileId.set(selectedFiles[0]?.id ?? null);
     this.ocrResult.set(null);
     this.confirmedDocumentId.set(null);
     this.documentIdControl.reset();
     this.ocrMessage.set(null);
     this.documentIdConfirmationMessage.set(null);
     this.saveMessage.set(null);
+    void this.persistDraftBundle(selectedFiles);
   }
 
   onUploadStageChange(stage: 'selected' | 'uploading' | 'uploaded'): void {
