@@ -182,7 +182,11 @@ export class DocumentUploadWorkflowComponent {
     this.uploadForm.controls.files.setValue(remaining.map((item) => item.sourceFile));
     this.validationMessage.set(null);
     this.filesChanged.emit(remaining);
-    this.uploadStateChange.emit(remaining.length ? 'selected' : 'none');
+    this.uploadStateChange.emit(
+      remaining.length && remaining.every((item) => item.status === 'uploaded')
+        ? 'uploaded'
+        : remaining.length ? 'selected' : 'none'
+    );
   }
 
   uploadSelectedFiles(): void {
