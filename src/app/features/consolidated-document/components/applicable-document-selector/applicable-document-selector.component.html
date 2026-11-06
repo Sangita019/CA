@@ -14,7 +14,7 @@
           <strong>{{ document.label }}</strong>
           <small>{{ document.required ? 'Mandatory' : 'Optional' }}</small>
           @if (unavailableDocumentIds().has(document.id)) {
-            <small class="duplicate-message">Already uploaded in another category</small>
+            <small class="duplicate-message">{{ unavailableDocumentMessages().get(document.id) ?? 'Already uploaded in another category' }}</small>
           }
         </span>
         @if (selectedDocumentId() === document.id) {
