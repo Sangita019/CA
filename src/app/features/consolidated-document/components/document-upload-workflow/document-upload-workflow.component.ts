@@ -106,10 +106,6 @@ export class DocumentUploadWorkflowComponent {
     if (!selectedFiles.length) return;
 
     const existingUploads = this.uploads();
-    if (replaceFileId && selectedFiles.length !== 1) {
-      this.validationMessage.set('Select one replacement file at a time.');
-      return;
-    }
     const retainedUploads = replaceFileId
       ? existingUploads.filter((item) => item.id !== replaceFileId)
       : existingUploads;
