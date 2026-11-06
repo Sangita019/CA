@@ -87,7 +87,6 @@ export class ConsolidatedDocumentComponent {
   readonly documentIdConfirmed = output<string>();
 
   readonly selectedTabIndex = signal(0);
-  readonly workflowSelected = signal(false);
   readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
   readonly files = signal<readonly (UploadedDocumentFile & { sourceFile: File })[]>([]);
   readonly restoredUploads = signal<readonly DocumentUploadItem[]>([]);
@@ -199,19 +198,6 @@ export class ConsolidatedDocumentComponent {
     this.ocrMessage.set(null);
     this.documentIdConfirmationMessage.set(null);
     this.saveMessage.set(null);
-  }
-
-  onWorkflowSelectionChange(checked: boolean): void {
-    this.workflowSelected.set(checked);
-    if (!checked) {
-      this.revokeUrls(this.files());
-      this.files.set([]);
-      this.restoredUploads.set([]);
-      this.previewFileId.set(null);
-      this.ocrResult.set(null);
-      this.ocrMessage.set(null);
-      this.confirmedDocumentId.set(null);
-    }
   }
 
   finalizeWorkflowOcr(items: readonly DocumentUploadItem[]): void {
@@ -507,12 +493,16 @@ export class ConsolidatedDocumentComponent {
           blob: file.sourceFile
         }))
       });
-      this.documentStore.markUploaded({
-        documentId: document.id,
-        tabId: tab.id,
-        documentLabel: document.label,
-        confirmedDocumentId: this.confirmedDocumentId()
-      });
+      if (this.confirmedDocumentId()) {
+        this.documentStore.markSaved(document.id, tab.id, document.label, this.confirmedDocumentId());
+      } else {
+        this.documentStore.markUploaded({
+          documentId: document.id,
+          tabId: tab.id,
+          documentLabel: document.label,
+          confirmedDocumentId: null
+        });
+      }
       this.saveMessage.set('Document saved. Use Save Tab to finalize this entire category.');
     } catch {
       this.saveMessage.set('Could not save this document in browser storage. Check available storage and try again.');
@@ -618,7 +608,6 @@ export class ConsolidatedDocumentComponent {
         progress: 100,
         status: 'uploaded' as const
       })));
-      this.workflowSelected.set(true);
       this.confirmedDocumentId.set(bundle.confirmedDocumentId);
       this.documentIdControl.setValue(bundle.confirmedDocumentId ?? '');
       this.previewFileId.set(restored[0]?.id ?? null);
@@ -637,7 +626,6 @@ export class ConsolidatedDocumentComponent {
   }
 
   private resetDocumentState(): void {
-    this.workflowSelected.set(false);
     this.revokeUrls(this.files());
     this.files.set([]);
     this.restoredUploads.set([]);
