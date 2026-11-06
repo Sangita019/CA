@@ -42,7 +42,7 @@ export class DocumentUploadWorkflowComponent {
   readonly ocrCompleted = input(false);
   readonly restoredUploads = input<readonly DocumentUploadItem[]>([]);
   readonly filesChanged = output<readonly DocumentUploadItem[]>();
-  readonly uploadStateChange = output<'selected' | 'uploading' | 'uploaded'>();
+  readonly uploadStateChange = output<'none' | 'selected' | 'uploading' | 'uploaded'>();
   readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
 
   readonly uploadForm = new FormGroup({
@@ -182,7 +182,7 @@ export class DocumentUploadWorkflowComponent {
     this.uploadForm.controls.files.setValue(remaining.map((item) => item.sourceFile));
     this.validationMessage.set(null);
     this.filesChanged.emit(remaining);
-    this.uploadStateChange.emit(remaining.length ? 'selected' : 'selected');
+    this.uploadStateChange.emit(remaining.length ? 'selected' : 'none');
   }
 
   uploadSelectedFiles(): void {
