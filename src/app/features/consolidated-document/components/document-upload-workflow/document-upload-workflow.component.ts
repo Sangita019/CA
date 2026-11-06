@@ -12,9 +12,9 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
+import { FormControl, FormGroup } from '@angular/forms';
 import { ConsolidatedDocumentOption } from '../../models/consolidated-document.models';
 import {
   DOCUMENT_UPLOAD_ACCEPT,
@@ -28,7 +28,6 @@ import { MockDocumentUploadService } from './services/mock-document-upload.servi
   standalone: true,
   imports: [
     MatButtonModule,
-    MatCheckboxModule,
     MatProgressBarModule,
   ],
   templateUrl: './document-upload-workflow.component.html',
@@ -37,13 +36,14 @@ import { MockDocumentUploadService } from './services/mock-document-upload.servi
 })
 export class DocumentUploadWorkflowComponent {
   readonly document = input.required<ConsolidatedDocumentOption>();
-  readonly selected = input(false);
   readonly ocrCompleted = input(false);
   readonly restoredUploads = input<readonly DocumentUploadItem[]>([]);
-  readonly selectionChange = output<boolean>();
   readonly filesChanged = output<void>();
   readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
 
+  readonly uploadForm = new FormGroup({
+    files: new FormControl<readonly File[]>([], { nonNullable: true })
+  });
   readonly uploads = signal<readonly DocumentUploadItem[]>([]);
   readonly validationMessage = signal<string | null>(null);
   readonly uploadComplete = computed(() =>
@@ -91,7 +91,6 @@ export class DocumentUploadWorkflowComponent {
       this.clearUploads();
       this.uploads.set([]);
     }
-    this.selectionChange.emit(checked);
   }
 
   onFilesSelected(event: Event): void {
@@ -100,10 +99,6 @@ export class DocumentUploadWorkflowComponent {
     inputElement.value = '';
 
     if (!selectedFiles.length) return;
-    if (!this.selected()) {
-      this.validationMessage.set('Select this document before choosing files.');
-      return;
-    }
 
     const existingUploads = this.uploads();
     const validationError = this.validateFiles([
@@ -138,6 +133,7 @@ export class DocumentUploadWorkflowComponent {
     }));
 
     this.uploads.set([...existingUploads, ...items]);
+    this.uploadForm.controls.files.setValue([...existingUploads, ...items].map((item) => item.sourceFile));
     this.validationMessage.set(null);
     this.filesChanged.emit();
   }
