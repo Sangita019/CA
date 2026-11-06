@@ -1,1 +1,6 @@
-<span class="status-chip" [class]="cssClass()" role="status">{{ label() }}</span>
+<span class="status-chip"
+  [class.status-chip--neutral]="tone() === 'neutral'"
+  [class.status-chip--info]="tone() === 'info'"
+  [class.status-chip--success]="tone() === 'success'"
+  [class.status-chip--warning]="tone() === 'warning'"
+  role="status">{{ label() }}</span>
