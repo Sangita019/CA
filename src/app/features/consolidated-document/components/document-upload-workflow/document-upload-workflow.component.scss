@@ -1,7 +1,7 @@
 :host { display: block; min-width: 0; margin-top: 18px; }
 .document-upload-workflow { display: block; padding-top: 14px; border-top: 1px solid #e5eaf0; }
-.upload-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .85fr); gap: 24px; align-items: start; }
-.upload-content { display: grid; justify-items: start; gap: 12px; padding: 8px 0; min-width: 0; }
+.upload-layout { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(280px, .8fr); gap: 16px; align-items: start; }
+.upload-content { display: grid; justify-items: stretch; gap: 12px; padding: 8px 0; min-width: 0; }
 .upload-content [document-identification] { box-sizing: border-box; display: block; width: 100%; min-width: 0; margin-top: 10px; }
 .upload-guidance { margin: 0; color: #5f6368; font-size: 13px; }
 .native-file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap; }
