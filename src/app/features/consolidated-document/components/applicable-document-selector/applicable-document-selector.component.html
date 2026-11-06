@@ -7,8 +7,8 @@
         [attr.role]="'radio'"
         [attr.aria-checked]="selectedDocumentId() === document.id"
         [attr.aria-disabled]="unavailableDocumentIds().has(document.id)"
-        [disabled]="unavailableDocumentIds().has(document.id)"
-        (click)="documentSelected.emit(document.id)">
+        [disabled]="disabled() || unavailableDocumentIds().has(document.id)"
+        (click)="onDocumentChange(document.id)">
         <span class="document-icon" aria-hidden="true">{{ document.label.toLowerCase().includes('pan') ? '▤' : document.label.toLowerCase().includes('passport') ? '▣' : '▧' }}</span>
         <span class="document-card__body">
           <strong>{{ document.label }}</strong>
