@@ -106,6 +106,13 @@ export class DocumentUploadWorkflowComponent {
     if (!selectedFiles.length) return;
 
     const existingUploads = this.uploads();
+    const replacedItem = replaceFileId
+      ? existingUploads.find((item) => item.id === replaceFileId)
+      : undefined;
+    if (replacedItem?.type === 'image' && selectedFiles.length !== 1) {
+      this.validationMessage.set('Replace an image with one file at a time. To replace a PDF, you can select up to five images.');
+      return;
+    }
     const retainedUploads = replaceFileId
       ? existingUploads.filter((item) => item.id !== replaceFileId)
       : existingUploads;
@@ -124,8 +131,8 @@ export class DocumentUploadWorkflowComponent {
     const newFiles = selectedFiles.filter((file) =>
       !existingKeys.has(`${file.name}-${file.size}-${file.lastModified}`)
     );
-    if (!newFiles.length) {
-      this.validationMessage.set('The selected file is already in the upload list.');
+    if (!newFiles.length || newFiles.length !== selectedFiles.length) {
+      this.validationMessage.set('One or more selected files are already in the upload list.');
       return;
     }
 
@@ -140,10 +147,7 @@ export class DocumentUploadWorkflowComponent {
       status: 'queued'
     }));
 
-    if (replaceFileId) {
-      const replaced = existingUploads.find((item) => item.id === replaceFileId);
-      if (replaced) URL.revokeObjectURL(replaced.objectUrl);
-    }
+    if (replaceFileId && replacedItem) URL.revokeObjectURL(replacedItem.objectUrl);
     const nextUploads = [...retainedUploads, ...items];
     this.uploads.set(nextUploads);
     this.previewFileId.set(items[0]?.id ?? this.previewFileId());
