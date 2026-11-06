@@ -76,6 +76,7 @@
                 [ocrCompleted]="ocrResult() !== null"
                 [restoredUploads]="restoredUploads()"
                 (filesChanged)="onWorkflowFilesChanged()"
+                (uploadStateChange)="onUploadStageChange($event)"
                 (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
                 />
 
