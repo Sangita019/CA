@@ -13,6 +13,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { DocumentPreviewComponent } from '../document-preview/document-preview.component';
 
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ConsolidatedDocumentOption } from '../../models/consolidated-document.models';
@@ -30,6 +31,7 @@ import { DOCUMENT_UPLOAD_GATEWAY } from '../../services/document-workflow-gatewa
     MatButtonModule,
     MatProgressBarModule,
     ReactiveFormsModule,
+    DocumentPreviewComponent,
   ],
   templateUrl: './document-upload-workflow.component.html',
   styleUrl: './document-upload-workflow.component.scss',
@@ -47,6 +49,8 @@ export class DocumentUploadWorkflowComponent {
     files: new FormControl<readonly File[]>([], { nonNullable: true })
   });
   readonly uploads = signal<readonly DocumentUploadItem[]>([]);
+  readonly previewFileId = signal<string | null>(null);
+  private replacingFileId: string | null = null;
   readonly validationMessage = signal<string | null>(null);
   readonly uploadComplete = computed(() =>
     this.uploads().length > 0 && this.uploads().every((file) => file.status === 'uploaded')
@@ -75,6 +79,7 @@ export class DocumentUploadWorkflowComponent {
       if (this.currentDocumentId !== null && this.currentDocumentId !== documentId) {
         this.clearUploads();
         this.uploads.set([]);
+        this.previewFileId.set(null);
         this.uploadForm.controls.files.setValue([]);
         this.validationMessage.set(null);
       }
@@ -84,6 +89,7 @@ export class DocumentUploadWorkflowComponent {
       const restored = this.restoredUploads();
       untracked(() => this.clearUploads());
       this.uploads.set(restored);
+      this.previewFileId.set(restored[0]?.id ?? null);
       this.uploadForm.controls.files.setValue(restored.map((item) => item.sourceFile));
       if (restored.length && restored.every((file) => file.status === 'uploaded')) {
         this.uploadStateChange.emit('uploaded');
@@ -92,7 +98,7 @@ export class DocumentUploadWorkflowComponent {
     this.destroyRef.onDestroy(() => this.clearUploads());
   }
 
-  onFilesSelected(event: Event): void {
+  onFilesSelected(event: Event, replaceFileId: string | null = null): void {
     const inputElement = event.target as HTMLInputElement;
     const selectedFiles = Array.from(inputElement.files ?? []);
     inputElement.value = '';
@@ -100,8 +106,15 @@ export class DocumentUploadWorkflowComponent {
     if (!selectedFiles.length) return;
 
     const existingUploads = this.uploads();
+    if (replaceFileId && selectedFiles.length !== 1) {
+      this.validationMessage.set('Select one replacement file at a time.');
+      return;
+    }
+    const retainedUploads = replaceFileId
+      ? existingUploads.filter((item) => item.id !== replaceFileId)
+      : existingUploads;
     const validationError = this.validateFiles([
-      ...existingUploads.map((item) => item.sourceFile),
+      ...retainedUploads.map((item) => item.sourceFile),
       ...selectedFiles
     ]);
     if (validationError) {
@@ -109,7 +122,7 @@ export class DocumentUploadWorkflowComponent {
       return;
     }
 
-    const existingKeys = new Set(existingUploads.map((item) =>
+    const existingKeys = new Set(retainedUploads.map((item) =>
       `${item.name}-${item.size}-${item.sourceFile.lastModified}`
     ));
     const newFiles = selectedFiles.filter((file) =>
@@ -131,11 +144,45 @@ export class DocumentUploadWorkflowComponent {
       status: 'queued'
     }));
 
-    this.uploads.set([...existingUploads, ...items]);
-    this.uploadForm.controls.files.setValue([...existingUploads, ...items].map((item) => item.sourceFile));
+    if (replaceFileId) {
+      const replaced = existingUploads.find((item) => item.id === replaceFileId);
+      if (replaced) URL.revokeObjectURL(replaced.objectUrl);
+    }
+    const nextUploads = [...retainedUploads, ...items];
+    this.uploads.set(nextUploads);
+    this.previewFileId.set(items[0]?.id ?? this.previewFileId());
+    this.uploadForm.controls.files.setValue(nextUploads.map((item) => item.sourceFile));
     this.validationMessage.set(null);
-    this.filesChanged.emit(this.uploads());
+    this.filesChanged.emit(nextUploads);
     this.uploadStateChange.emit('selected');
+  }
+
+  previewFile(fileId: string): void {
+    this.previewFileId.set(fileId);
+  }
+
+  replaceFile(fileId: string, input: HTMLInputElement): void {
+    this.replacingFileId = fileId;
+    input.click();
+  }
+
+  onReplacementSelected(event: Event): void {
+    const targetId = this.replacingFileId;
+    this.replacingFileId = null;
+    this.onFilesSelected(event, targetId);
+  }
+
+  removeFile(fileId: string): void {
+    const removed = this.uploads().find((item) => item.id === fileId);
+    if (!removed) return;
+    URL.revokeObjectURL(removed.objectUrl);
+    const remaining = this.uploads().filter((item) => item.id !== fileId);
+    this.uploads.set(remaining);
+    this.previewFileId.set(remaining[0]?.id ?? null);
+    this.uploadForm.controls.files.setValue(remaining.map((item) => item.sourceFile));
+    this.validationMessage.set(null);
+    this.filesChanged.emit(remaining);
+    this.uploadStateChange.emit(remaining.length ? 'selected' : 'selected');
   }
 
   uploadSelectedFiles(): void {
@@ -208,5 +255,6 @@ export class DocumentUploadWorkflowComponent {
 
   private clearUploads(): void {
     this.uploads().forEach((item) => URL.revokeObjectURL(item.objectUrl));
+    this.previewFileId.set(null);
   }
 }
