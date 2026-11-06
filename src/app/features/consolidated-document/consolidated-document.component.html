@@ -63,8 +63,9 @@
 
             <ca-applicable-document-selector
               [documents]="tab.documents"
-              [selectedDocumentId]="selectedDocumentId()"
+              [formControl]="documentSelectionControl"
               [unavailableDocumentIds]="unavailableDocumentIds()"
+              [unavailableDocumentMessages]="unavailableDocumentMessages()"
               [unavailableDocumentMessages]="unavailableDocumentMessages()"
               (documentSelected)="selectDocument($event)" />
 
