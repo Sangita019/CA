@@ -1,5 +1,6 @@
 <section class="document-upload-workflow" aria-label="Document upload workflow">
-  <div class="upload-content" [formGroup]="uploadForm">
+  <div class="upload-layout">
+    <div class="upload-content" [formGroup]="uploadForm">
       <p class="upload-guidance">
         Up to 5 images and / or 1 PDF per document (JPEG, JPG, JFIF, PNG, PDF) · max 10 MB each
       </p>
@@ -13,6 +14,14 @@
         [disabled]="isUploading()"
         (change)="onFilesSelected($event)"
         aria-label="Add document files" />
+      <input
+        #replaceInput
+        class="native-file-input"
+        type="file"
+        [accept]="accept"
+        [disabled]="isUploading()"
+        (change)="onReplacementSelected($event)"
+        aria-label="Replace selected document file" />
       <button
         mat-stroked-button
         color="primary"
@@ -52,6 +61,13 @@
                   [attr.aria-label]="'Upload progress for ' + file.name"
                   color="primary" />
               }
+              <div class="file-actions">
+                <button mat-button type="button" (click)="previewFile(file.id)">Preview</button>
+                <button mat-button type="button" [disabled]="isUploading()"
+                  (click)="replaceFile(file.id, replaceInput)">Replace</button>
+                <button mat-button type="button" [disabled]="isUploading()"
+                  (click)="removeFile(file.id)">Remove</button>
+              </div>
             </article>
           }
         </div>
@@ -76,5 +92,15 @@
           </button>
         </div>
       }
+    </div>
+
+    @if (uploads().length) {
+      <div class="upload-preview" aria-label="Selected file preview">
+        <ca-document-preview
+          [files]="uploads()"
+          [selectedFileId]="previewFileId()"
+          (fileSelected)="previewFile($event)" />
+      </div>
+    }
   </div>
 </section>
