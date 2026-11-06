@@ -73,16 +73,9 @@
                 [restoredUploads]="restoredUploads()"
                 (filesChanged)="onWorkflowFilesChanged($event)"
                 (uploadStateChange)="onUploadStageChange($event)"
-                (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
-                />
-
-              @if (ocrMessage(); as message) {
-                <p class="feedback-message" role="status">{{ message }}</p>
-              }
-
+                (finalizeOcrRequested)="finalizeWorkflowOcr($event)">
               @if (ocrResult() || confirmedDocumentId()) {
-                <div class="document-identification-layout">
-                  <section class="document-identification" aria-labelledby="document-identification-title">
+                <section document-identification class="document-identification" aria-labelledby="document-identification-title">
                     <h3 id="document-identification-title">Document identification number</h3>
                     <div class="document-identification__fields">
                       <label>
@@ -112,9 +105,15 @@
                         {{ saving() ? 'Saving…' : 'Save changes' }}
                       </button>
                     </div>
-                  </section>
-                </div>
+                </section>
               }
+
+              </ca-document-upload-workflow>
+
+              @if (ocrMessage(); as message) {
+                <p class="feedback-message" role="status">{{ message }}</p>
+              }
+
 
             }
           </div>
