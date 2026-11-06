@@ -17,7 +17,7 @@
         [class.summary-chip--active]="selectedTabIndex() === index"
         [attr.aria-expanded]="selectedTabIndex() === index"
         [attr.aria-controls]="'document-tab-panel-' + tab.id"
-        [attr.aria-label]="'Open ' + tab.label + ' category. ' + categoryStatus(tab, index)"
+        [attr.aria-label]="'Open ' + tab.label + ' category'"
         (click)="selectTab(index)">
         <span>{{ tab.label }}</span>
         @if (categoryDocumentLabel(tab) !== 'No document selected') {
