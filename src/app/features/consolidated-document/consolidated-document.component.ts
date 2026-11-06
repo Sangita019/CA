@@ -90,6 +90,7 @@ export class ConsolidatedDocumentComponent {
 
   readonly selectedTabIndex = signal(0);
   readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
+  readonly uploadStage = signal<'none' | 'selected' | 'uploading' | 'uploaded'>('none');
   readonly files = signal<readonly (UploadedDocumentFile & { sourceFile: File })[]>([]);
   readonly restoredUploads = signal<readonly DocumentUploadItem[]>([]);
   readonly previewFileId = signal<string | null>(null);
@@ -152,7 +153,9 @@ export class ConsolidatedDocumentComponent {
     if (records.some((record) => record.status === 'saved')) return 'Complete';
     if (isActive && this.ocrResult()) return 'OCR done – Save identifier';
     if (records.some((record) => record.status === 'uploaded')) return 'Uploaded – OCR pending';
-    if (isActive && this.files().length) return 'Upload pending';
+    if (isActive && this.uploadStage() === 'uploading') return 'Upload in Progress';
+    if (isActive && this.uploadStage() === 'uploaded') return 'Uploaded – OCR pending';
+    if (isActive && this.uploadStage() === 'selected') return 'Upload pending';
     if (isActive && this.selectedDocument()) return 'Selected – No files yet';
     return 'Not Started';
   }
@@ -161,7 +164,7 @@ export class ConsolidatedDocumentComponent {
     const status = this.categoryStatus(tab, index);
     if (status === 'Complete') return 'success';
     if (status === 'OCR done – Save identifier' || status === 'Uploaded – OCR pending') return 'info';
-    if (status === 'Upload pending' || status === 'OCR in Progress') return 'warning';
+    if (status === 'Upload pending' || status === 'Upload in Progress' || status === 'OCR in Progress') return 'warning';
     return 'neutral';
   }
 
@@ -193,6 +196,7 @@ export class ConsolidatedDocumentComponent {
   }
 
   onWorkflowFilesChanged(): void {
+    this.uploadStage.set('selected');
     this.files.set([]);
     this.previewFileId.set(null);
     this.ocrResult.set(null);
@@ -203,7 +207,12 @@ export class ConsolidatedDocumentComponent {
     this.saveMessage.set(null);
   }
 
+  onUploadStageChange(stage: 'selected' | 'uploading' | 'uploaded'): void {
+    this.uploadStage.set(stage);
+  }
+
   finalizeWorkflowOcr(items: readonly DocumentUploadItem[]): void {
+    this.uploadStage.set('uploaded');
     const workflowFiles = items.map((item) => ({
       id: item.id,
       name: item.name,
@@ -606,6 +615,7 @@ export class ConsolidatedDocumentComponent {
         };
       });
       this.files.set(restored);
+      this.uploadStage.set('uploaded');
       this.restoredUploads.set(restored.map((file) => ({
         ...file,
         progress: 100,
@@ -630,6 +640,7 @@ export class ConsolidatedDocumentComponent {
 
   private resetDocumentState(): void {
     this.revokeUrls(this.files());
+    this.uploadStage.set('none');
     this.files.set([]);
     this.restoredUploads.set([]);
     this.previewFileId.set(null);
