@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DocumentUploadGateway } from '../../../services/document-workflow-gateways';
+import type { DocumentUploadGateway } from '../../../services/document-workflow-gateways';
 import { Observable, interval } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 
