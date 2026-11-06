@@ -39,7 +39,7 @@ export class DocumentUploadWorkflowComponent {
   readonly document = input.required<ConsolidatedDocumentOption>();
   readonly ocrCompleted = input(false);
   readonly restoredUploads = input<readonly DocumentUploadItem[]>([]);
-  readonly filesChanged = output<void>();
+  readonly filesChanged = output<readonly DocumentUploadItem[]>();
   readonly uploadStateChange = output<'selected' | 'uploading' | 'uploaded'>();
   readonly finalizeOcrRequested = output<readonly DocumentUploadItem[]>();
 
@@ -84,19 +84,12 @@ export class DocumentUploadWorkflowComponent {
       const restored = this.restoredUploads();
       untracked(() => this.clearUploads());
       this.uploads.set(restored);
+      this.uploadForm.controls.files.setValue(restored.map((item) => item.sourceFile));
       if (restored.length && restored.every((file) => file.status === 'uploaded')) {
         this.uploadStateChange.emit('uploaded');
       }
     });
     this.destroyRef.onDestroy(() => this.clearUploads());
-  }
-
-  onDocumentChecked(checked: boolean): void {
-    this.validationMessage.set(null);
-    if (!checked) {
-      this.clearUploads();
-      this.uploads.set([]);
-    }
   }
 
   onFilesSelected(event: Event): void {
@@ -141,7 +134,7 @@ export class DocumentUploadWorkflowComponent {
     this.uploads.set([...existingUploads, ...items]);
     this.uploadForm.controls.files.setValue([...existingUploads, ...items].map((item) => item.sourceFile));
     this.validationMessage.set(null);
-    this.filesChanged.emit();
+    this.filesChanged.emit(this.uploads());
     this.uploadStateChange.emit('selected');
   }
 
