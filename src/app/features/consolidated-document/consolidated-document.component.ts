@@ -31,6 +31,7 @@ import { DocumentPreviewComponent } from './components/document-preview/document
 import { ApplicableDocumentSelectorComponent } from './components/applicable-document-selector/applicable-document-selector.component';
 import { DocumentUploadWorkflowComponent } from './components/document-upload-workflow/document-upload-workflow.component';
 import { DocumentUploadItem } from './components/document-upload-workflow/models/document-upload.models';
+import { DocumentStatusChipComponent } from './components/document-status-chip/document-status-chip.component';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -74,7 +75,8 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatExpansionModule,
     DocumentPreviewComponent,
     ApplicableDocumentSelectorComponent,
-    DocumentUploadWorkflowComponent
+    DocumentUploadWorkflowComponent,
+    DocumentStatusChipComponent
   ],
   templateUrl: './consolidated-document.component.html',
   styleUrl: './consolidated-document.component.scss',
@@ -143,23 +145,24 @@ export class ConsolidatedDocumentComponent {
   }
 
   categoryStatus(tab: ConsolidatedDocumentTab, index: number): string {
-    if (index === this.selectedTabIndex() && this.ocrLoading()) return 'OCR in Progress';
-    if (index === this.selectedTabIndex() && this.ocrResult()) return 'OCR Complete';
-    if (this.documentStore.records().some((record) => record.tabId === tab.id && record.status === 'saved')) {
-      return 'Saved';
-    }
-    if (this.documentStore.records().some((record) => record.tabId === tab.id && record.status === 'uploaded')) {
-      return 'Document Saved';
-    }
-    if (index === this.selectedTabIndex() && this.files().length) return 'Files Selected';
+    const isActive = index === this.selectedTabIndex();
+    const records = this.documentStore.records().filter((record) => record.tabId === tab.id);
+    if (isActive && this.ocrLoading()) return 'OCR in Progress';
+    if (isActive && this.confirmedDocumentId()) return 'Complete';
+    if (records.some((record) => record.status === 'saved')) return 'Complete';
+    if (isActive && this.ocrResult()) return 'OCR done – Save identifier';
+    if (records.some((record) => record.status === 'uploaded')) return 'Uploaded – OCR pending';
+    if (isActive && this.files().length) return 'Upload pending';
+    if (isActive && this.selectedDocument()) return 'Selected – No files yet';
     return 'Not Started';
   }
 
-  categoryStatusColor(tab: ConsolidatedDocumentTab, index: number): 'primary' | 'accent' | 'warn' {
+  categoryStatusTone(tab: ConsolidatedDocumentTab, index: number): 'neutral' | 'info' | 'success' | 'warning' {
     const status = this.categoryStatus(tab, index);
-    if (status === 'Saved' || status === 'OCR Complete') return 'primary';
-    if (status === 'OCR in Progress' || status === 'Files Selected') return 'accent';
-    return 'warn';
+    if (status === 'Complete') return 'success';
+    if (status === 'OCR done – Save identifier' || status === 'Uploaded – OCR pending') return 'info';
+    if (status === 'Upload pending' || status === 'OCR in Progress') return 'warning';
+    return 'neutral';
   }
 
   selectTab(index: number): void {
