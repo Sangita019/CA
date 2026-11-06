@@ -149,7 +149,6 @@ export class ConsolidatedDocumentComponent {
     const isActive = index === this.selectedTabIndex();
     const records = this.documentStore.records().filter((record) => record.tabId === tab.id);
     if (isActive && this.ocrLoading()) return 'OCR in Progress';
-    if (isActive && this.confirmedDocumentId()) return 'Complete';
     if (records.some((record) => record.status === 'saved')) return 'Complete';
     if (isActive && this.ocrResult()) return 'OCR done – Save identifier';
     if (records.some((record) => record.status === 'uploaded')) return 'Uploaded – OCR pending';
