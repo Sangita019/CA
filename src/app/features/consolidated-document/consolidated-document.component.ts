@@ -9,7 +9,7 @@ import {
   signal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -73,6 +73,7 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     MatButtonModule,
     MatDialogModule,
     MatExpansionModule,
+    ReactiveFormsModule,
     DocumentPreviewComponent,
     ApplicableDocumentSelectorComponent,
     DocumentUploadWorkflowComponent,
@@ -105,6 +106,7 @@ export class ConsolidatedDocumentComponent {
   readonly confirmedDocumentId = signal<string | null>(null);
 
   readonly documentIdControl = new FormControl('', { nonNullable: true });
+  readonly documentSelectionControl = new FormControl<string | null>(null);
 
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
@@ -206,6 +208,7 @@ export class ConsolidatedDocumentComponent {
     this.changeSelectionWithConfirmation(() => {
       this.selectedTabIndex.set(index);
       this.selectedDocumentId.set(nextDocumentId);
+      this.documentSelectionControl.setValue(nextDocumentId);
       this.documentStore.select(nextTab?.id ?? '', nextDocumentId);
     });
   }
@@ -217,6 +220,7 @@ export class ConsolidatedDocumentComponent {
 
     this.changeSelectionWithConfirmation(() => {
       this.selectedDocumentId.set(documentId);
+      this.documentSelectionControl.setValue(documentId);
       this.documentStore.select(this.tabs()[this.selectedTabIndex()]?.id ?? '', documentId);
     });
   }
@@ -622,6 +626,7 @@ export class ConsolidatedDocumentComponent {
 
     this.selectedTabIndex.set(resolvedTabIndex);
     this.selectedDocumentId.set(document?.id ?? null);
+    this.documentSelectionControl.setValue(document?.id ?? null);
     if (tab && document) {
       await this.restoreDocumentFiles(document.id, tab.id);
     }
