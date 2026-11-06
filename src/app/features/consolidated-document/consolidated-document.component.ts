@@ -24,7 +24,7 @@ import {
   ChangeDocumentDialogComponent,
   ChangeDocumentDialogData
 } from './change-document-dialog.component';
-import { ConsolidatedDocumentMockService } from './services/consolidated-document-mock.service';
+import { DOCUMENT_OCR_GATEWAY } from './services/document-workflow-gateways';
 import { DocumentFileStorageService } from './services/document-file-storage.service';
 import { ConsolidatedDocumentStore } from './store/consolidated-document.store';
 import { DocumentPreviewComponent } from './components/document-preview/document-preview.component';
@@ -108,7 +108,7 @@ export class ConsolidatedDocumentComponent {
 
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly mockService = inject(ConsolidatedDocumentMockService);
+  private readonly ocrGateway = inject(DOCUMENT_OCR_GATEWAY);
   private readonly fileStorage = inject(DocumentFileStorageService);
   readonly documentStore = inject(ConsolidatedDocumentStore);
 
@@ -450,7 +450,7 @@ export class ConsolidatedDocumentComponent {
     this.documentIdConfirmationMessage.set(null);
     this.ocrRequested.emit(files);
 
-    this.mockService
+    this.ocrGateway
       .processOcr(document.id, files)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
