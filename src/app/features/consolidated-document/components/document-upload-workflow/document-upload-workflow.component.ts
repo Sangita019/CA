@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ConsolidatedDocumentOption } from '../../models/consolidated-document.models';
 import {
   DOCUMENT_UPLOAD_ACCEPT,
@@ -29,6 +29,7 @@ import { MockDocumentUploadService } from './services/mock-document-upload.servi
   imports: [
     MatButtonModule,
     MatProgressBarModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './document-upload-workflow.component.html',
   styleUrl: './document-upload-workflow.component.scss',
