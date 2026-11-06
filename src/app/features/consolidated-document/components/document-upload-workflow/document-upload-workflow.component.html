@@ -18,6 +18,7 @@
         #replaceInput
         class="native-file-input"
         type="file"
+        multiple
         [accept]="accept"
         [disabled]="isUploading()"
         (change)="onReplacementSelected($event)"
