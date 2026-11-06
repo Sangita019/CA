@@ -118,8 +118,9 @@
         </div>
       }
 
-      <ng-content select="[document-identification]" />
     </div>
+
+    <ng-content select="[document-identification]" />
 
     @if (uploads().length) {
       <div class="upload-preview" aria-label="Selected file preview">
