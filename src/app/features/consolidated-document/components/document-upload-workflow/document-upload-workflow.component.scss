@@ -11,8 +11,12 @@
 .file-name { overflow-wrap: anywhere; }
 .file-status { white-space: nowrap; font-weight: 600; }
 .file-status--uploaded { color: #23784e; }
-.file-actions { display: flex; flex-wrap: wrap; gap: 4px; }
-.file-actions button { min-width: 0; padding-inline: 8px; font-size: 12px; }
+.file-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.file-actions button { min-width: 0; min-height: 30px; padding: 0 10px; border-radius: 16px; font-size: 12px; line-height: 28px; }
+.file-action--preview { border-color: #b9c9da; color: #315f87; }
+.file-action--active { background: #edf5fc; border-color: #477ca8; }
+.file-action--remove { color: #a33d3d; }
+.file-actions button:focus-visible { outline: 2px solid #326ea7; outline-offset: 2px; }
 .upload-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .finalize-button { width: fit-content; min-width: 0; padding-inline: 14px; }
 .upload-preview { min-width: 0; min-height: 260px; }
