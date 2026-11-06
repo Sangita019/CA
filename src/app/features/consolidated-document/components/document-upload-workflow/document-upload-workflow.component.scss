@@ -1,12 +1,8 @@
 :host { display: block; min-width: 0; margin-top: 18px; }
 .document-upload-workflow { display: block; padding-top: 14px; border-top: 1px solid #e5eaf0; }
-.upload-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .9fr) minmax(300px, 1fr); gap: 20px; align-items: start; }
+.upload-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .85fr); gap: 24px; align-items: start; }
 .upload-content { display: grid; justify-items: start; gap: 12px; padding: 8px 0; min-width: 0; }
-.upload-layout > [document-identification] { box-sizing: border-box; width: 100%; min-width: 0; margin-top: 10px; grid-column: 2; }
-.upload-layout:not(:has(> [document-identification])) { grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); }
-.upload-layout:not(:has(> [document-identification])) .upload-preview { grid-column: 2; }
-.upload-layout:has(> [document-identification]) .upload-content { grid-column: 1; }
-.upload-layout:has(> [document-identification]) .upload-preview { grid-column: 3; }
+.upload-content [document-identification] { box-sizing: border-box; display: block; width: 100%; min-width: 0; margin-top: 10px; }
 .upload-guidance { margin: 0; color: #5f6368; font-size: 13px; }
 .native-file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap; }
 .add-files-button { width: fit-content; min-width: 0; }
@@ -40,12 +36,7 @@
 }
 .validation-message { margin: 0; color: #b3261e; font-size: 13px; }
 @media (max-width: 900px) {
-  .upload-layout,
-  .upload-layout:not(:has(> [document-identification])) { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .upload-layout > [document-identification],
-  .upload-layout:has(> [document-identification]) .upload-content,
-  .upload-layout:has(> [document-identification]) .upload-preview,
-  .upload-layout:not(:has(> [document-identification])) .upload-preview { grid-column: 1; }
+  .upload-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .upload-preview { justify-self: stretch; max-width: none; margin-top: 0; }
 }
 @media (max-width: 600px) {
