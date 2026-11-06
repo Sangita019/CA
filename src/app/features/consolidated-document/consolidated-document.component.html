@@ -75,7 +75,7 @@
                 [document]="document"
                 [ocrCompleted]="ocrResult() !== null"
                 [restoredUploads]="restoredUploads()"
-                (filesChanged)="onWorkflowFilesChanged()"
+                (filesChanged)="onWorkflowFilesChanged($event)"
                 (uploadStateChange)="onUploadStageChange($event)"
                 (finalizeOcrRequested)="finalizeWorkflowOcr($event)"
                 />
@@ -85,9 +85,7 @@
               }
 
               @if (ocrResult() || confirmedDocumentId()) {
-                <div class="analysis-layout">
-                  <ca-document-preview [files]="files()" [selectedFileId]="previewFileId()"
-                    (fileSelected)="selectPreview($event)" />
+                <div class="document-identification-layout">
                   <section class="document-identification" aria-labelledby="document-identification-title">
                     <h3 id="document-identification-title">Document identification number</h3>
                     <div class="document-identification__fields">
