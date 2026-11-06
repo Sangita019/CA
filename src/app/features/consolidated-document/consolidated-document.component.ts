@@ -89,7 +89,7 @@ export class ConsolidatedDocumentComponent {
   readonly documentIdConfirmed = output<string>();
 
   readonly selectedTabIndex = signal(0);
-  readonly selectedDocumentId = signal<string | null>(DEFAULT_TABS[0]?.documents[0]?.id ?? null);
+  readonly selectedDocumentId = signal<string | null>(null);
   readonly uploadStage = signal<'none' | 'selected' | 'uploading' | 'uploaded'>('none');
   readonly files = signal<readonly (UploadedDocumentFile & { sourceFile: File })[]>([]);
   readonly restoredUploads = signal<readonly DocumentUploadItem[]>([]);
@@ -177,8 +177,11 @@ export class ConsolidatedDocumentComponent {
 
     const nextTab = this.tabs()[index];
     const nextDocumentId = nextTab?.documents.find((document) =>
-      !this.documentStore.isUnavailableInTab(document, nextTab.id)
-    )?.id ?? nextTab?.documents[0]?.id ?? null;
+      this.documentStore.records().some((record) =>
+        record.tabId === nextTab.id && record.documentId === document.id &&
+        (record.status === 'uploaded' || record.status === 'saved')
+      )
+    )?.id ?? null;
     this.changeSelectionWithConfirmation(() => {
       this.selectedTabIndex.set(index);
       this.selectedDocumentId.set(nextDocumentId);
@@ -594,8 +597,7 @@ export class ConsolidatedDocumentComponent {
     const resolvedTabIndex = tabIndex >= 0 ? tabIndex : 0;
     const tab = this.tabs()[resolvedTabIndex];
     const preferredDocumentId = this.documentStore.selectedDocumentId();
-    const document = tab?.documents.find((option) => option.id === preferredDocumentId)
-      ?? tab?.documents[0];
+    const document = tab?.documents.find((option) => option.id === preferredDocumentId);
 
     this.selectedTabIndex.set(resolvedTabIndex);
     this.selectedDocumentId.set(document?.id ?? null);
