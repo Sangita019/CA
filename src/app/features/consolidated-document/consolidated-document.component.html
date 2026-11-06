@@ -63,7 +63,6 @@
               [formControl]="documentSelectionControl"
               [unavailableDocumentIds]="unavailableDocumentIds()"
               [unavailableDocumentMessages]="unavailableDocumentMessages()"
-              [unavailableDocumentMessages]="unavailableDocumentMessages()"
               (documentSelected)="selectDocument($event)" />
 
             @if (selectedDocument(); as document) {
