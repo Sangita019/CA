@@ -1,12 +1,5 @@
 <section class="document-upload-workflow" aria-label="Document upload workflow">
-  <mat-checkbox
-    [checked]="selected()"
-    (change)="onDocumentChecked($event.checked)">
-    {{ document().label }} applies to this category
-  </mat-checkbox>
-
-  @if (selected()) {
-    <div class="upload-content">
+  <div class="upload-content">
       <p class="upload-guidance">
         Up to 5 images and / or 1 PDF per document (JPEG, JPG, JFIF, PNG, PDF) · max 10 MB each
       </p>
@@ -83,6 +76,5 @@
           </button>
         </div>
       }
-    </div>
-  }
+  </div>
 </section>
