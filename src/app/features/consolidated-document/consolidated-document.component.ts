@@ -217,7 +217,7 @@ export class ConsolidatedDocumentComponent {
     void this.persistDraftBundle(selectedFiles);
   }
 
-  onUploadStageChange(stage: 'selected' | 'uploading' | 'uploaded'): void {
+  onUploadStageChange(stage: 'none' | 'selected' | 'uploading' | 'uploaded'): void {
     this.uploadStage.set(stage);
   }
 
