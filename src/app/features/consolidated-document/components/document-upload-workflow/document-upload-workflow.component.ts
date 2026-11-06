@@ -21,7 +21,7 @@ import {
   DOCUMENT_UPLOAD_LIMITS,
   DocumentUploadItem
 } from './models/document-upload.models';
-import { MockDocumentUploadService } from './services/mock-document-upload.service';
+import { DOCUMENT_UPLOAD_GATEWAY } from '../../services/document-workflow-gateways';
 
 @Component({
   selector: 'ca-document-upload-workflow',
@@ -65,7 +65,7 @@ export class DocumentUploadWorkflowComponent {
       : 'Upload complete';
   });
   readonly accept = DOCUMENT_UPLOAD_ACCEPT;
-  private readonly uploader = inject(MockDocumentUploadService);
+  private readonly uploader = inject(DOCUMENT_UPLOAD_GATEWAY);
   private readonly destroyRef = inject(DestroyRef);
   private currentDocumentId: string | null = null;
 
