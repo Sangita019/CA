@@ -23,9 +23,6 @@
         @if (categoryDocumentLabel(tab) !== 'No document selected') {
           <span class="summary-chip__document">{{ categoryDocumentLabel(tab) }}</span>
         }
-        <ca-document-status-chip
-          [label]="categoryStatus(tab, index)"
-          [tone]="categoryStatusTone(tab, index)" />
       </button>
     }
     <span class="summary-note">Select one document per category</span>
@@ -68,6 +65,7 @@
               [documents]="tab.documents"
               [selectedDocumentId]="selectedDocumentId()"
               [unavailableDocumentIds]="unavailableDocumentIds()"
+              [unavailableDocumentMessages]="unavailableDocumentMessages()"
               (documentSelected)="selectDocument($event)" />
 
             @if (selectedDocument(); as document) {
