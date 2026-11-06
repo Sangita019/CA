@@ -23,15 +23,17 @@
         [disabled]="isUploading()"
         (change)="onReplacementSelected($event)"
         aria-label="Replace selected document file" />
-      <button
-        mat-stroked-button
-        color="primary"
-        type="button"
-        class="add-files-button"
-        [disabled]="isUploading()"
-        (click)="fileInput.click()">
-        Add more files
-      </button>
+      @if (!uploadComplete()) {
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          class="add-files-button"
+          [disabled]="isUploading()"
+          (click)="fileInput.click()">
+          Add more files
+        </button>
+      }
 
       @if (validationMessage(); as message) {
         <p class="validation-message" role="alert">{{ message }}</p>
@@ -62,12 +64,34 @@
                   [attr.aria-label]="'Upload progress for ' + file.name"
                   color="primary" />
               }
-              <div class="file-actions">
-                <button mat-button type="button" (click)="previewFile(file.id)">Preview</button>
-                <button mat-button type="button" [disabled]="isUploading()"
-                  (click)="replaceFile(file.id, replaceInput)">Replace</button>
-                <button mat-button type="button" [disabled]="isUploading()"
-                  (click)="removeFile(file.id)">Remove</button>
+              <div class="file-actions" role="group" [attr.aria-label]="'Actions for ' + file.name">
+                <button
+                  mat-stroked-button
+                  type="button"
+                  class="file-action file-action--preview"
+                  [class.file-action--active]="previewFileId() === file.id"
+                  [attr.aria-pressed]="previewFileId() === file.id"
+                  (click)="previewFile(file.id)">
+                  Preview
+                </button>
+                <button
+                  mat-button
+                  type="button"
+                  class="file-action"
+                  [disabled]="isUploading()"
+                  [attr.aria-label]="'Replace ' + file.name"
+                  (click)="replaceFile(file.id, replaceInput)">
+                  Replace
+                </button>
+                <button
+                  mat-button
+                  type="button"
+                  class="file-action file-action--remove"
+                  [disabled]="isUploading()"
+                  [attr.aria-label]="'Remove ' + file.name"
+                  (click)="removeFile(file.id)">
+                  Remove
+                </button>
               </div>
             </article>
           }
