@@ -193,9 +193,10 @@ export class ConsolidatedDocumentComponent {
   }
 
   categoryDocumentLabel(tab: ConsolidatedDocumentTab): string {
-    const selected = tab.documents.find((document) =>
-      document.id === this.selectedDocumentId() && this.allTabs()[this.selectedTabIndex()]?.id === tab.id
-    );
+    const selectedDocumentId = this.allTabs()[this.selectedTabIndex()]?.id === tab.id
+      ? this.selectedDocumentId()
+      : this.tabSelections()[tab.id] ?? null;
+    const selected = tab.documents.find((document) => document.id === selectedDocumentId);
     const saved = this.documentStore.records().find((record) =>
       record.tabId === tab.id &&
       (record.status === 'uploaded' || record.status === 'saved')
