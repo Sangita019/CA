@@ -122,7 +122,7 @@
   </mat-accordion>
 
   <div class="additional-document-actions">
-    <button mat-stroked-button color="primary" type="button" (click)="addAdditionalDocument()">
+    <button mat-stroked-button color="primary" type="button" (click)="addAdditionalDocument()" [disabled]="additionalTabs().length >= 50">
       + Add another document
     </button>
   </div>
