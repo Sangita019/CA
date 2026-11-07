@@ -1,0 +1,24 @@
+.credit-check { margin-top: 22px; padding: 18px; border: 1px solid #e1e7ef; border-radius: 8px; background: #fff; }
+.credit-check__heading h2 { margin: 0; color: #293b55; font-size: 15px; font-weight: 700; }
+.credit-check__heading p { margin: 7px 0 0; color: #53647b; font-size: 13px; }
+.credit-check__answers { display: flex; gap: 22px; margin-top: 13px; }
+.credit-check__answers label { display: inline-flex; align-items: center; gap: 7px; color: #33445c; font-size: 13px; cursor: pointer; }
+.credit-check__answers input { accent-color: #354b9a; }
+.credit-check__action { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.credit-check__action button { border-radius: 5px; }
+.credit-check__action span, .credit-report__header p, .credit-report__reference { color: #68788e; font-size: 11px; }
+.credit-check__error { color: #b42318; font-size: 12px; }
+.credit-report { margin-top: 16px; padding: 13px; border: 1px solid #e1e7ef; border-radius: 6px; }
+.credit-report__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.credit-report__header strong { color: #34465e; font-size: 13px; }
+.credit-report__header p { margin: 4px 0 0; }
+.credit-report__decision, .credit-report__assessment { display: inline-block; padding: 3px 7px; border-radius: 4px; background: #e3f3e9; color: #24734b; font-size: 10px; font-weight: 700; }
+.credit-report__decision[data-tone="AMBER"], .credit-report__assessment[data-tone="AMBER"] { background: #fff1cc; color: #8a6410; }
+.credit-report__decision[data-tone="RED"], .credit-report__assessment[data-tone="RED"] { background: #fde8e7; color: #a12d27; }
+.credit-report__table-wrap { overflow-x: auto; margin-top: 12px; }
+.credit-report table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+.credit-report th, .credit-report td { padding: 8px; border-bottom: 1px solid #edf0f4; }
+.credit-report th { color: #465870; font-weight: 650; }
+.credit-report td { color: #596a80; }
+.credit-report__reference { margin: 10px 0 0; }
+@media (max-width: 640px) { .credit-check { padding: 13px; } .credit-report__header { align-items: flex-start; } .credit-report table { min-width: 620px; } }
