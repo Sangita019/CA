@@ -24,6 +24,14 @@
           <span class="summary-chip__document">{{ categoryDocumentLabel(tab) }}</span>
         }
       </button>
+      @if (isAdditionalTab(tab)) {
+        <button mat-button type="button"
+          class="summary-chip-remove"
+          [attr.aria-label]="'Delete ' + tab.label"
+          (click)="$event.stopPropagation(); removeAdditionalDocument(tab)">
+          Remove
+        </button>
+      }
     }
     <span class="summary-note">Select one document per category</span>
   </div>
