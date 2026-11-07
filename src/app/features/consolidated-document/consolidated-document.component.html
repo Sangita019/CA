@@ -59,12 +59,9 @@
 
         @if (selectedTabIndex() === index) {
           <div class="category-content" [attr.aria-label]="tab.label + ' document options'">
-            <div class="section-heading">
-              <div>
-                <h2>{{ tab.label }} <span class="muted">— select 1 document</span></h2>
-                <p>Choose the document type that matches the file you are uploading.</p>
-              </div>
-            </div>
+            <p class="document-options-hint">
+              Choose the document type that matches the file you are uploading.
+            </p>
 
             <ca-applicable-document-selector
               [documents]="tab.documents"
