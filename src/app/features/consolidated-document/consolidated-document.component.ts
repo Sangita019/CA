@@ -246,7 +246,7 @@ export class ConsolidatedDocumentComponent {
       const resolvedDocumentId = this.tabSelections()[nextTab?.id ?? ''] ?? nextDocumentId;
       this.documentSelectionControl.setValue(resolvedDocumentId);
       this.tabSelections.update((selections) => ({ ...selections, [nextTab?.id ?? '']: resolvedDocumentId }));
-      this.documentStore.select(nextTab?.id ?? '', nextDocumentId);
+      this.documentStore.select(nextTab?.id ?? '', resolvedDocumentId);
     });
   }
 
@@ -690,6 +690,7 @@ export class ConsolidatedDocumentComponent {
     this.selectedTabIndex.set(resolvedTabIndex);
     this.selectedDocumentId.set(document?.id ?? null);
     this.documentSelectionControl.setValue(document?.id ?? null);
+    if (tab) this.tabSelections.update((selections) => ({ ...selections, [tab.id]: document?.id ?? null }));
     if (tab && document) {
       await this.restoreDocumentFiles(document.id, tab.id);
     }
