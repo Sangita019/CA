@@ -32,6 +32,8 @@ import { ApplicableDocumentSelectorComponent } from './components/applicable-doc
 import { DocumentUploadWorkflowComponent } from './components/document-upload-workflow/document-upload-workflow.component';
 import { DocumentUploadItem } from './components/document-upload-workflow/models/document-upload.models';
 import { DocumentStatusChipComponent } from './components/document-status-chip/document-status-chip.component';
+import { CreditExposureCheckComponent } from './components/credit-exposure-check/credit-exposure-check.component';
+import { ADDITIONAL_DOCUMENT_OPTIONS } from './models/additional-document.models';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -77,7 +79,8 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
     DocumentPreviewComponent,
     ApplicableDocumentSelectorComponent,
     DocumentUploadWorkflowComponent,
-    DocumentStatusChipComponent
+    DocumentStatusChipComponent,
+    CreditExposureCheckComponent
   ],
   templateUrl: './consolidated-document.component.html',
   styleUrl: './consolidated-document.component.scss',
@@ -89,6 +92,8 @@ export class ConsolidatedDocumentComponent {
   readonly ocrRequested = output<readonly UploadedDocumentFile[]>();
   readonly documentIdConfirmed = output<string>();
 
+  readonly additionalTabs = signal<readonly ConsolidatedDocumentTab[]>([]);
+  readonly allTabs = computed<readonly ConsolidatedDocumentTab[]>(() => [...this.tabs(), ...this.additionalTabs()]);
   readonly selectedTabIndex = signal(0);
   readonly selectedDocumentId = signal<string | null>(null);
   readonly uploadStage = signal<'none' | 'selected' | 'uploading' | 'uploaded'>('none');
@@ -150,6 +155,23 @@ export class ConsolidatedDocumentComponent {
   readonly unavailableDocumentIds = computed<ReadonlySet<string>>(() =>
     new Set(this.unavailableDocumentMessages().keys())
   );
+
+  addAdditionalDocument(): void {
+    const nextNumber = this.additionalTabs().length + 1;
+    const tab: ConsolidatedDocumentTab = {
+      id: `additional-document-${nextNumber}`,
+      label: `Additional document ${nextNumber} (optional)`,
+      documents: ADDITIONAL_DOCUMENT_OPTIONS
+    };
+    this.additionalTabs.update((tabs) => [...tabs, tab]);
+    this.changeSelectionWithConfirmation(() => {
+      const nextIndex = this.allTabs().findIndex((item) => item.id === tab.id);
+      this.selectedTabIndex.set(nextIndex);
+      this.selectedDocumentId.set(null);
+      this.documentSelectionControl.setValue(null);
+      this.documentStore.select(tab.id, null);
+    });
+  }
 
   categorySaved(tab: ConsolidatedDocumentTab): boolean {
     return this.documentStore.records().some((record) =>
