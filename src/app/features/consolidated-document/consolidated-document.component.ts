@@ -94,7 +94,7 @@ export class ConsolidatedDocumentComponent {
   readonly ocrRequested = output<readonly UploadedDocumentFile[]>();
   readonly documentIdConfirmed = output<string>();
 
-  readonly additionalTabs = signal<readonly ConsolidatedDocumentTab[]>(this.buildAdditionalTabs(this.additionalTabsStorage.loadCount()));
+  readonly additionalTabs = signal<readonly ConsolidatedDocumentTab[]>(this.buildAdditionalTabs(this.additionalTabsStorage.loadIds()));
   readonly tabSelections = signal<Readonly<Record<string, string | null>>>({});
   readonly allTabs = computed<readonly ConsolidatedDocumentTab[]>(() => [...this.tabs(), ...this.additionalTabs()]);
   readonly selectedTabIndex = signal(0);
@@ -160,15 +160,19 @@ export class ConsolidatedDocumentComponent {
   );
 
   addAdditionalDocument(): void {
-    if (this.additionalTabs().length >= 50) return;
-    const nextNumber = this.additionalTabs().length + 1;
+    const existingTabs = this.additionalTabs();
+    if (existingTabs.length >= 50) return;
+    const nextNumber = existingTabs.reduce((maximum, tab) => {
+      const suffix = Number(tab.id.replace('additional-document-', ''));
+      return Number.isInteger(suffix) ? Math.max(maximum, suffix) : maximum;
+    }, 0) + 1;
     const tab: ConsolidatedDocumentTab = {
       id: `additional-document-${nextNumber}`,
-      label: `Additional document ${nextNumber} (optional)`,
-      documents: ADDITIONAL_DOCUMENT_OPTIONS
+      label: `Additional document ${existingTabs.length + 1} (optional)`,
+      documents: [...ADDITIONAL_DOCUMENT_OPTIONS]
     };
     this.additionalTabs.update((tabs) => [...tabs, tab]);
-    this.additionalTabsStorage.saveCount(this.additionalTabs().length);
+    this.additionalTabsStorage.saveIds(this.additionalTabs().map((item) => item.id));
     this.changeSelectionWithConfirmation(() => {
       const nextIndex = this.allTabs().findIndex((item) => item.id === tab.id);
       this.selectedTabIndex.set(nextIndex);
@@ -179,11 +183,89 @@ export class ConsolidatedDocumentComponent {
     });
   }
 
-  private buildAdditionalTabs(count: number): readonly ConsolidatedDocumentTab[] {
-    return Array.from({ length: count }, (_, index) => ({
-      id: `additional-document-${index + 1}`,
+  isAdditionalTab(tab: ConsolidatedDocumentTab): boolean {
+    return tab.id.startsWith('additional-document-');
+  }
+
+  removeAdditionalDocument(tab: ConsolidatedDocumentTab): void {
+    if (!this.isAdditionalTab(tab)) return;
+    const dialogData: ChangeDocumentDialogData = {
+      currentDocument: `${tab.label}. Its selected files and saved OCR data will be deleted.`
+    };
+    this.dialog.open(ChangeDocumentDialogComponent, {
+      width: 'min(420px, calc(100vw - 32px))',
+      data: dialogData,
+      disableClose: true
+    }).afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmed: boolean | undefined) => {
+        if (confirmed) void this.deleteAdditionalDocument(tab);
+      });
+  }
+
+  private async deleteAdditionalDocument(tab: ConsolidatedDocumentTab): Promise<void> {
+    const currentTabs = this.additionalTabs();
+    const tabIndex = currentTabs.findIndex((item) => item.id === tab.id);
+    if (tabIndex < 0) return;
+
+    const deletedGlobalIndex = this.tabs().length + tabIndex;
+    const activeGlobalIndex = this.selectedTabIndex();
+    const wasActive = this.allTabs()[activeGlobalIndex]?.id === tab.id;
+    const records = this.documentStore.records().filter((record) => record.tabId === tab.id);
+    const documentIds = new Set([
+      ...tab.documents.map((document) => document.id),
+      ...records.map((record) => record.documentId)
+    ]);
+
+    this.additionalTabs.set(currentTabs.filter((item) => item.id !== tab.id)
+      .map((item, index) => ({
+        ...item,
+        label: `Additional document ${index + 1} (optional)`
+      })));
+    this.additionalTabsStorage.saveIds(this.additionalTabs().map((item) => item.id));
+    this.documentStore.clearTab(tab.id);
+    this.tabSelections.update((selections) => {
+      const next = { ...selections };
+      delete next[tab.id];
+      return next;
+    });
+
+    const storageResults = await Promise.allSettled(
+      Array.from(documentIds, (documentId) => this.fileStorage.deleteBundle(documentId, tab.id))
+    );
+    const storageFailed = storageResults.some((result) => result.status === 'rejected');
+
+    if (wasActive) {
+      this.resetDocumentState();
+      this.selectedTabIndex.set(Math.max(0, Math.min(deletedGlobalIndex, this.allTabs().length - 1)));
+      const nextTab = this.allTabs()[this.selectedTabIndex()];
+      const nextDocumentId = nextTab?.documents.find((document) =>
+        this.documentStore.records().some((record) =>
+          record.tabId === nextTab.id && record.documentId === document.id &&
+          (record.status === 'uploaded' || record.status === 'saved')
+        )
+      )?.id ?? null;
+      const resolvedDocumentId = this.tabSelections()[nextTab?.id ?? ''] ?? nextDocumentId;
+      this.selectedDocumentId.set(resolvedDocumentId);
+      this.documentSelectionControl.setValue(resolvedDocumentId);
+      this.documentStore.select(nextTab?.id ?? '', resolvedDocumentId);
+      if (nextTab && resolvedDocumentId) {
+        void this.restoreDocumentFiles(resolvedDocumentId, nextTab.id);
+      }
+    } else if (activeGlobalIndex > deletedGlobalIndex) {
+      this.selectedTabIndex.set(activeGlobalIndex - 1);
+    }
+
+    this.saveMessage.set(storageFailed
+      ? 'The optional tab was removed, but some saved browser files could not be cleared.'
+      : 'The optional document tab and its saved data were deleted.');
+  }
+
+  private buildAdditionalTabs(ids: readonly string[]): readonly ConsolidatedDocumentTab[] {
+    return ids.map((id, index) => ({
+      id,
       label: `Additional document ${index + 1} (optional)`,
-      documents: ADDITIONAL_DOCUMENT_OPTIONS
+      documents: [...ADDITIONAL_DOCUMENT_OPTIONS]
     }));
   }
 
