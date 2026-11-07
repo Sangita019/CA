@@ -10,7 +10,7 @@
 
   <div class="selected-summary" aria-label="Document upload instructions">
     <strong>Documents selected</strong>
-    @for (tab of tabs(); track tab.id; let index = $index) {
+    @for (tab of allTabs(); track tab.id; let index = $index) {
       <button type="button"
         class="summary-chip"
         [class.summary-chip--saved]="categorySaved(tab)"
@@ -29,7 +29,7 @@
   </div>
 
   <mat-accordion class="category-accordion" [multi]="false">
-    @for (tab of tabs(); track tab.id; let index = $index) {
+    @for (tab of allTabs(); track tab.id; let index = $index) {
       <mat-expansion-panel class="category-panel"
         [id]="'document-tab-panel-' + tab.id"
         [expanded]="selectedTabIndex() === index"
@@ -120,6 +120,14 @@
       </mat-expansion-panel>
     }
   </mat-accordion>
+
+  <div class="additional-document-actions">
+    <button mat-stroked-button color="primary" type="button" (click)="addAdditionalDocument()">
+      + Add another document
+    </button>
+  </div>
+
+  <ca-credit-exposure-check />
 
   <footer class="save-footer">
     <div class="footer-messages">
