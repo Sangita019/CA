@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, delay, of } from 'rxjs';
-import { CreditExposureGateway } from './credit-exposure.gateway';
+import type { CreditExposureGateway } from './credit-exposure.gateway';
 import { CreditExposureReport, CreditExposureRequest } from '../models/credit-exposure.models';
 
 /** Local demonstration data only. Replace this gateway implementation with HttpClient when the CRIF API contract is available. */
