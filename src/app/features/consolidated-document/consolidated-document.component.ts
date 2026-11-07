@@ -124,12 +124,12 @@ export class ConsolidatedDocumentComponent {
   }
 
   readonly selectedDocument = computed<ConsolidatedDocumentOption | null>(() => {
-    const tab = this.tabs()[this.selectedTabIndex()];
+    const tab = this.allTabs()[this.selectedTabIndex()];
     return tab?.documents.find((document) => document.id === this.selectedDocumentId()) ?? null;
   });
 
   readonly unavailableDocumentMessages = computed<ReadonlyMap<string, string>>(() => {
-    const activeTab = this.tabs()[this.selectedTabIndex()];
+    const activeTab = this.allTabs()[this.selectedTabIndex()];
     const messages = new Map<string, string>();
     if (!activeTab) return messages;
 
@@ -141,7 +141,7 @@ export class ConsolidatedDocumentComponent {
       );
       if (!existingRecord) continue;
 
-      const existingTab = this.tabs().find((tab) => tab.id === existingRecord.tabId);
+      const existingTab = this.allTabs().find((tab) => tab.id === existingRecord.tabId);
       messages.set(
         document.id,
         existingTab
@@ -181,7 +181,7 @@ export class ConsolidatedDocumentComponent {
 
   categoryDocumentLabel(tab: ConsolidatedDocumentTab): string {
     const selected = tab.documents.find((document) =>
-      document.id === this.selectedDocumentId() && this.tabs()[this.selectedTabIndex()]?.id === tab.id
+      document.id === this.selectedDocumentId() && this.allTabs()[this.selectedTabIndex()]?.id === tab.id
     );
     const saved = this.documentStore.records().find((record) =>
       record.tabId === tab.id &&
@@ -220,7 +220,7 @@ export class ConsolidatedDocumentComponent {
       return;
     }
 
-    const nextTab = this.tabs()[index];
+    const nextTab = this.allTabs()[index];
     const nextDocumentId = nextTab?.documents.find((document) =>
       this.documentStore.records().some((record) =>
         record.tabId === nextTab.id && record.documentId === document.id &&
@@ -243,7 +243,7 @@ export class ConsolidatedDocumentComponent {
     this.changeSelectionWithConfirmation(() => {
       this.selectedDocumentId.set(documentId);
       this.documentSelectionControl.setValue(documentId);
-      this.documentStore.select(this.tabs()[this.selectedTabIndex()]?.id ?? '', documentId);
+      this.documentStore.select(this.allTabs()[this.selectedTabIndex()]?.id ?? '', documentId);
     });
   }
 
@@ -262,7 +262,7 @@ export class ConsolidatedDocumentComponent {
     this.documentIdConfirmationMessage.set(null);
     this.saveMessage.set(null);
 
-    const tab = this.tabs()[this.selectedTabIndex()];
+    const tab = this.allTabs()[this.selectedTabIndex()];
     const document = this.selectedDocument();
     if (tab) {
       // File changes invalidate the previous saved/complete state for this category.
@@ -323,7 +323,7 @@ export class ConsolidatedDocumentComponent {
 
   private changeSelectionWithConfirmation(changeSelection: () => void): void {
     const currentDocument = this.selectedDocument();
-    const currentTab = this.tabs()[this.selectedTabIndex()];
+    const currentTab = this.allTabs()[this.selectedTabIndex()];
     const currentDocumentSaved = Boolean(currentDocument && currentTab &&
       this.documentStore.records().some((record) =>
         record.documentId === currentDocument.id &&
@@ -334,7 +334,7 @@ export class ConsolidatedDocumentComponent {
     const proceed = (): void => {
       changeSelection();
       this.resetDocumentState();
-      const nextTab = this.tabs()[this.selectedTabIndex()];
+      const nextTab = this.allTabs()[this.selectedTabIndex()];
       const nextDocument = this.selectedDocument();
       if (nextTab && nextDocument) {
         void this.restoreDocumentFiles(nextDocument.id, nextTab.id);
@@ -453,7 +453,7 @@ export class ConsolidatedDocumentComponent {
 
     const remaining = currentFiles.filter((item) => item.id !== fileId);
     const document = this.selectedDocument();
-    const tab = this.tabs()[this.selectedTabIndex()];
+    const tab = this.allTabs()[this.selectedTabIndex()];
     const wasSaved = Boolean(document && tab && this.documentStore.records().some((record) =>
       record.documentId === document.id && record.tabId === tab.id && record.status === 'saved'
     ));
@@ -563,7 +563,7 @@ export class ConsolidatedDocumentComponent {
 
   async saveDocument(): Promise<void> {
     const document = this.selectedDocument();
-    const tab = this.tabs()[this.selectedTabIndex()];
+    const tab = this.allTabs()[this.selectedTabIndex()];
     const files = this.files();
     if (!document || !tab || !files.length) {
       this.saveMessage.set('Select a document and upload at least one file before saving this document.');
@@ -605,7 +605,7 @@ export class ConsolidatedDocumentComponent {
   }
 
   async saveTab(): Promise<void> {
-    const tab = this.tabs()[this.selectedTabIndex()];
+    const tab = this.allTabs()[this.selectedTabIndex()];
     if (!tab) {
       this.saveMessage.set('The selected document category is unavailable.');
       return;
@@ -631,7 +631,7 @@ export class ConsolidatedDocumentComponent {
     files: readonly (UploadedDocumentFile & { sourceFile: File })[]
   ): Promise<void> {
     const document = this.selectedDocument();
-    const tab = this.tabs()[this.selectedTabIndex()];
+    const tab = this.allTabs()[this.selectedTabIndex()];
     if (!document || !tab) {
       return;
     }
@@ -664,9 +664,9 @@ export class ConsolidatedDocumentComponent {
 
   private async restoreSavedDocument(): Promise<void> {
     const snapshotTabId = this.documentStore.selectedTabId();
-    const tabIndex = this.tabs().findIndex((tab) => tab.id === snapshotTabId);
+    const tabIndex = this.allTabs().findIndex((tab) => tab.id === snapshotTabId);
     const resolvedTabIndex = tabIndex >= 0 ? tabIndex : 0;
-    const tab = this.tabs()[resolvedTabIndex];
+    const tab = this.allTabs()[resolvedTabIndex];
     const preferredDocumentId = this.documentStore.selectedDocumentId();
     const document = tab?.documents.find((option) => option.id === preferredDocumentId);
 
