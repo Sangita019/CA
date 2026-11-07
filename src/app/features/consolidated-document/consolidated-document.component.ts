@@ -160,6 +160,7 @@ export class ConsolidatedDocumentComponent {
   );
 
   addAdditionalDocument(): void {
+    if (this.additionalTabs().length >= 50) return;
     const nextNumber = this.additionalTabs().length + 1;
     const tab: ConsolidatedDocumentTab = {
       id: `additional-document-${nextNumber}`,
