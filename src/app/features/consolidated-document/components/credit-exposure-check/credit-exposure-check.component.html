@@ -50,6 +50,9 @@
           </tbody>
         </table>
       </div>
+      @if (result.reportUrl) {
+        <a class="credit-report__link" [href]="result.reportUrl" target="_blank" rel="noopener noreferrer">View full CRIF report</a>
+      }
       <p class="credit-report__reference">Reference: {{ result.referenceId }} · Demonstration data only; not a live bureau response.</p>
     </section>
   }
