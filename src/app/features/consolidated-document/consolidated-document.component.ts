@@ -34,6 +34,7 @@ import { DocumentUploadItem } from './components/document-upload-workflow/models
 import { DocumentStatusChipComponent } from './components/document-status-chip/document-status-chip.component';
 import { CreditExposureCheckComponent } from './components/credit-exposure-check/credit-exposure-check.component';
 import { ADDITIONAL_DOCUMENT_OPTIONS } from './models/additional-document.models';
+import { AdditionalDocumentTabsStorage } from './services/additional-document-tabs.storage';
 
 const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
   {
@@ -88,11 +89,13 @@ const DEFAULT_TABS: readonly ConsolidatedDocumentTab[] = [
 })
 export class ConsolidatedDocumentComponent {
   readonly tabs = input<readonly ConsolidatedDocumentTab[]>(DEFAULT_TABS);
+  private readonly additionalTabsStorage = inject(AdditionalDocumentTabsStorage);
   readonly saved = output<void>();
   readonly ocrRequested = output<readonly UploadedDocumentFile[]>();
   readonly documentIdConfirmed = output<string>();
 
-  readonly additionalTabs = signal<readonly ConsolidatedDocumentTab[]>([]);
+  readonly additionalTabs = signal<readonly ConsolidatedDocumentTab[]>(this.buildAdditionalTabs(this.additionalTabsStorage.loadCount()));
+  readonly tabSelections = signal<Readonly<Record<string, string | null>>>({});
   readonly allTabs = computed<readonly ConsolidatedDocumentTab[]>(() => [...this.tabs(), ...this.additionalTabs()]);
   readonly selectedTabIndex = signal(0);
   readonly selectedDocumentId = signal<string | null>(null);
@@ -164,13 +167,23 @@ export class ConsolidatedDocumentComponent {
       documents: ADDITIONAL_DOCUMENT_OPTIONS
     };
     this.additionalTabs.update((tabs) => [...tabs, tab]);
+    this.additionalTabsStorage.saveCount(this.additionalTabs().length);
     this.changeSelectionWithConfirmation(() => {
       const nextIndex = this.allTabs().findIndex((item) => item.id === tab.id);
       this.selectedTabIndex.set(nextIndex);
       this.selectedDocumentId.set(null);
       this.documentSelectionControl.setValue(null);
+      this.tabSelections.update((selections) => ({ ...selections, [tab.id]: null }));
       this.documentStore.select(tab.id, null);
     });
+  }
+
+  private buildAdditionalTabs(count: number): readonly ConsolidatedDocumentTab[] {
+    return Array.from({ length: count }, (_, index) => ({
+      id: `additional-document-${index + 1}`,
+      label: `Additional document ${index + 1} (optional)`,
+      documents: ADDITIONAL_DOCUMENT_OPTIONS
+    }));
   }
 
   categorySaved(tab: ConsolidatedDocumentTab): boolean {
@@ -229,8 +242,10 @@ export class ConsolidatedDocumentComponent {
     )?.id ?? null;
     this.changeSelectionWithConfirmation(() => {
       this.selectedTabIndex.set(index);
-      this.selectedDocumentId.set(nextDocumentId);
-      this.documentSelectionControl.setValue(nextDocumentId);
+      this.selectedDocumentId.set(this.tabSelections()[nextTab?.id ?? ''] ?? nextDocumentId);
+      const resolvedDocumentId = this.tabSelections()[nextTab?.id ?? ''] ?? nextDocumentId;
+      this.documentSelectionControl.setValue(resolvedDocumentId);
+      this.tabSelections.update((selections) => ({ ...selections, [nextTab?.id ?? '']: resolvedDocumentId }));
       this.documentStore.select(nextTab?.id ?? '', nextDocumentId);
     });
   }
@@ -243,6 +258,8 @@ export class ConsolidatedDocumentComponent {
     this.changeSelectionWithConfirmation(() => {
       this.selectedDocumentId.set(documentId);
       this.documentSelectionControl.setValue(documentId);
+      const activeTabId = this.allTabs()[this.selectedTabIndex()]?.id;
+      if (activeTabId) this.tabSelections.update((selections) => ({ ...selections, [activeTabId]: documentId }));
       this.documentStore.select(this.allTabs()[this.selectedTabIndex()]?.id ?? '', documentId);
     });
   }
