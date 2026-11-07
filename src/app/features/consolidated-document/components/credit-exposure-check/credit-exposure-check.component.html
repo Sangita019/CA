@@ -1,0 +1,56 @@
+<section class="credit-check" aria-labelledby="credit-check-title" [formGroup]="form">
+  <div class="credit-check__heading">
+    <div>
+      <h2 id="credit-check-title">Credit exposure check</h2>
+      <p>Have you availed any credit facility / exposure from other banks?</p>
+    </div>
+  </div>
+
+  <div class="credit-check__answers" role="radiogroup" aria-label="Other bank credit exposure">
+    <label><input type="radio" formControlName="hasOtherBankExposure" value="yes" /> Yes</label>
+    <label><input type="radio" formControlName="hasOtherBankExposure" value="no" /> No</label>
+  </div>
+  @if (form.controls.hasOtherBankExposure.invalid && form.controls.hasOtherBankExposure.touched) {
+    <p class="credit-check__error" role="alert">Select Yes or No to continue.</p>
+  }
+
+  <div class="credit-check__action">
+    <button mat-flat-button color="primary" type="button"
+      (click)="fetchReport()"
+      [disabled]="loading() || form.invalid">
+      {{ loading() ? 'Fetching CRIF report…' : report() ? 'Refresh CRIF report' : 'View CRIF report' }}
+    </button>
+    <span>Fetches the entity’s CRIF report from the bureau.</span>
+  </div>
+
+  @if (errorMessage(); as message) {
+    <p class="credit-check__error" role="alert">{{ message }}</p>
+  }
+
+  @if (report(); as result) {
+    <section class="credit-report" aria-live="polite" aria-label="CRIF report summary">
+      <header class="credit-report__header">
+        <div>
+          <strong>{{ result.decision }}</strong>
+          <p>CRIF report fetched {{ formattedFetchedAt(result.fetchedAt) }}</p>
+        </div>
+        <span class="credit-report__decision" [attr.data-tone]="result.decisionTone">{{ result.decisionTone }}</span>
+      </header>
+      <div class="credit-report__table-wrap">
+        <table>
+          <thead><tr><th scope="col">Parameter</th><th scope="col">Result</th><th scope="col">Assessment</th></tr></thead>
+          <tbody>
+            @for (metric of result.metrics; track metric.parameter) {
+              <tr>
+                <th scope="row">{{ metric.parameter }}</th>
+                <td>{{ metric.result }}</td>
+                <td><span class="credit-report__assessment" [attr.data-tone]="metric.assessment">{{ metric.assessment }}</span> {{ metric.assessmentText }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="credit-report__reference">Reference: {{ result.referenceId }} · Demonstration data only; not a live bureau response.</p>
+    </section>
+  }
+</section>
