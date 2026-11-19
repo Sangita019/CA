@@ -79,3 +79,77 @@
   .selected-summary { align-items: flex-start; }
   .summary-note { width: 100%; margin-left: 0; }
 }
+
+/* Wireframe blue hierarchy and visible status badges. */
+:host .section-heading h2,
+:host .upload-heading h2,
+:host .category-heading__title,
+:host .document-identification h3,
+:host .credit-check__heading h2 {
+  color: #173f78;
+}
+:host .category-heading__document,
+:host .document-options-hint,
+:host .page-description,
+:host .section-heading p {
+  color: #365779;
+}
+:host .category-panel .mat-expansion-panel-header {
+  border-bottom: 1px solid #d7e2f0;
+}
+:host .category-panel .mat-expansion-panel-header.mat-expanded {
+  background: #edf3fc;
+}
+:host .category-panel .mat-expansion-panel-header.mat-expanded .category-heading__title {
+  color: #123d78;
+}
+:host .section-status,
+:host .file-count {
+  border: 1px solid #d0a64b;
+  background: #fff0c2;
+  color: #704c08;
+  font-weight: 750;
+}
+:host .section-status--complete {
+  border-color: #80b99a;
+  background: #dff3e7;
+  color: #145d37;
+}
+:host ca-document-status-chip .status-chip {
+  min-height: 26px;
+  padding: 5px 11px;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .01em;
+  box-shadow: 0 1px 2px rgb(24 55 94 / 10%);
+}
+:host ca-document-status-chip .status-chip--neutral {
+  border-color: #b9cce4;
+  background: #e7effa;
+  color: #244d80;
+}
+:host ca-document-status-chip .status-chip--info {
+  border-color: #9bbce5;
+  background: #dceaff;
+  color: #174c8d;
+}
+:host ca-document-status-chip .status-chip--success {
+  border-color: #8bc5a2;
+  background: #dff3e7;
+  color: #145d37;
+}
+:host ca-document-status-chip .status-chip--warning {
+  border-color: #e3c477;
+  background: #fff0c9;
+  color: #79530a;
+}
+:host .additional-document-actions button {
+  border-width: 1.5px;
+  background: #edf4ff;
+  color: #174b89;
+  box-shadow: 0 1px 3px rgb(25 62 112 / 12%);
+}
+:host .additional-document-actions button:hover {
+  background: #dceaff;
+}
