@@ -3,6 +3,8 @@
 .eyebrow { color:#315b91; font-weight:750; }
 .page-header h1 { color:#123f78; font-weight:750; }
 .page-description { color:#365779; }
+.section-heading h2,.upload-heading h2,.document-identification h3 { color:#123f78; font-weight:800; }
+.section-heading p { color:#365779; }
 .workflow-label { border-color:#a9c2e2; color:#174b89; background:#edf4ff; font-weight:700; }
 .selected-summary { gap:8px; padding:10px 12px; border-color:#b8cce5; background:#eaf2fc; color:#1d477b; }
 .selected-summary strong { color:#123f78; font-weight:800; }
@@ -29,3 +31,6 @@
 :host .save-footer { border-top-color:#bdcde0; }
 .save-footer button { min-height:38px; font-weight:750; }
 @media(max-width:800px) { :host .screen { padding:12px; } .selected-summary { align-items:flex-start; } .summary-note { width:100%; margin-left:0; } }
+
+.section-status,.file-count { border:1px solid #9bb9df; background:#e4efff; color:#174b89; font-weight:800; }
+.section-status--complete { border-color:#80b99a; background:#e1f4e8; color:#145d37; }
