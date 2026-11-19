@@ -1,20 +1,6 @@
-:host { display: inline-flex; }
-.status-chip {
-  display: inline-flex;
-  align-items: center;
-  max-width: 100%;
-  min-height: 27px;
-  padding: 5px 11px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 750;
-  line-height: 1.35;
-  white-space: nowrap;
-  letter-spacing: .01em;
-  box-shadow: 0 1px 2px rgb(24 55 94 / 10%);
-}
-.status-chip--neutral { border-color: #b9cce4; background: #e7effa; color: #244d80; }
-.status-chip--info { border-color: #9bbce5; background: #dceaff; color: #174c8d; }
-.status-chip--success { border-color: #8bc5a2; background: #dff3e7; color: #145d37; }
-.status-chip--warning { border-color: #e3c477; background: #fff0c9; color: #79530a; }
+:host { display:inline-flex; }
+.status-chip { display:inline-flex; align-items:center; max-width:100%; min-height:29px; padding:5px 12px; border:1px solid transparent; border-radius:999px; font-size:11px; font-weight:800; line-height:1.35; white-space:nowrap; letter-spacing:.01em; box-shadow:0 1px 3px rgb(24 55 94 / 14%); }
+.status-chip--neutral { border-color:#91b2dc; background:#e5efff; color:#174b89; }
+.status-chip--info { border-color:#78a5df; background:#d7e8ff; color:#123f78; }
+.status-chip--success { border-color:#79b994; background:#dff3e7; color:#145d37; }
+.status-chip--warning { border-color:#d7b65e; background:#fff0c2; color:#704c08; }
