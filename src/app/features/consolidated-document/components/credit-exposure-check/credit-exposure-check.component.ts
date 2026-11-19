@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { distinctUntilChanged } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { CREDIT_EXPOSURE_GATEWAY } from '../../services/credit-exposure.gateway';
@@ -22,6 +23,15 @@ export class CreditExposureCheckComponent {
   readonly errorMessage = signal<string | null>(null);
   private readonly gateway = inject(CREDIT_EXPOSURE_GATEWAY);
   private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.form.controls.hasOtherBankExposure.valueChanges
+      .pipe(distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.report.set(null);
+        this.errorMessage.set(null);
+      });
+  }
 
   fetchReport(): void {
     if (this.form.invalid || this.loading()) {
