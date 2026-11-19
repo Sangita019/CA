@@ -290,11 +290,9 @@ export class ConsolidatedDocumentComponent {
   categoryStatus(tab: ConsolidatedDocumentTab, index: number): string {
     const isActive = index === this.selectedTabIndex();
     const records = this.documentStore.records().filter((record) => record.tabId === tab.id);
-    const tabSelectedDocumentId = isActive
-      ? this.selectedDocumentId()
-      : this.tabSelections()[tab.id] ?? records[0]?.documentId ?? null;
-    const selectedRecord = records.find((record) => record.documentId === tabSelectedDocumentId);
-
+    const selectedRecord = isActive
+      ? records.find((record) => record.documentId === this.selectedDocumentId())
+      : records[0];
     if (isActive && this.ocrLoading()) return 'OCR in Progress';
     if (selectedRecord?.status === 'saved') return 'Complete';
     if (isActive && this.ocrResult()) return 'OCR done – Save identifier';
@@ -302,7 +300,7 @@ export class ConsolidatedDocumentComponent {
     if (isActive && this.uploadStage() === 'uploading') return 'Upload in Progress';
     if (isActive && this.uploadStage() === 'uploaded') return 'Uploaded – OCR pending';
     if (isActive && this.uploadStage() === 'selected') return 'Upload pending';
-    if (tabSelectedDocumentId) return 'Selected – No files yet';
+    if (isActive && this.selectedDocument()) return 'Selected – No files yet';
     return 'Not Started';
   }
 
