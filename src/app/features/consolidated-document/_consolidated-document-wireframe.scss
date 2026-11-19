@@ -7,22 +7,22 @@
 .section-heading p { color:#365779; }
 .workflow-label { border-color:#a9c2e2; color:#174b89; background:#edf4ff; font-weight:700; }
 .selected-summary { gap:8px; padding:10px 12px; border-color:#b8cce5; background:#eaf2fc; color:#1d477b; }
-.selected-summary strong { color:#123f78; font-weight:800; }
-.summary-chip { min-height:30px; padding:5px 11px; border:1px solid #9eb8dc; border-radius:16px; background:#fff; color:#244f87; font-size:11px; font-weight:700; }
+.selected-summary strong { color:#103b73!important; font-weight:850; }
+.summary-chip { min-height:30px; padding:5px 11px; border:1.5px solid #6f9ed5; border-radius:16px; background:#edf4ff; color:#123f78!important; font-size:11px; font-weight:800; }
 .summary-chip--saved { border-color:#80b99a; background:#e5f5eb; color:#17633d; }
 .summary-chip--active { border:2px solid #245da0; background:#dceaff; color:#123f78; }
 .summary-chip__document { margin-left:5px; color:inherit; font-weight:800; }
 .summary-chip-remove { min-height:28px; color:#a32929; font-size:11px; }
-.summary-note { color:#244f80; font-weight:700; }
+.summary-note { color:#174b89!important; font-weight:750; }
 .category-accordion { margin-top:10px; }
 .category-panel { margin-bottom:7px; border:1px solid #bdcfe4; border-left:4px solid #4776b5; border-radius:5px!important; background:#fff; box-shadow:0 1px 3px rgb(22 43 71 / 9%)!important; }
 .category-panel.mat-expanded { border-color:#6f96c7; border-left-color:#174b89; }
 .category-panel .mat-expansion-panel-header,.category-panel .mat-expansion-panel-header.mat-expanded { min-height:60px; padding:9px 15px; background:#fff; }
 .category-panel .mat-expansion-panel-header:hover { background:#f0f5fd!important; }
 .category-heading { gap:3px; }
-.category-heading__title { color:#123f78; font-size:14px; font-weight:800; }
-.category-heading__document { color:#365779; font-size:11px; font-weight:650; }
-.category-panel mat-panel-description { color:#244f80; }
+.category-heading__title { color:#103b73!important; font-size:14px; font-weight:850; }
+.category-heading__document { color:#244d7b!important; font-size:11px; font-weight:700; }
+.category-panel mat-panel-description { color:#174b89!important; font-weight:750; }
 .category-content { padding:4px 10px 14px; }
 .document-options-hint { margin:0 0 10px; color:#31577f; font-size:12px; font-weight:650; }
 .additional-document-actions { margin:10px 0 16px; }
