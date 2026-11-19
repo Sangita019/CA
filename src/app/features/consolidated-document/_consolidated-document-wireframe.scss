@@ -1,5 +1,5 @@
 /* Compact, high-contrast document list inspired by the supplied wireframe. */
-.screen {
+:host .screen {
   padding: 18px 22px;
   background: #f3f6fa;
   color: #1d2d45;
@@ -71,11 +71,11 @@
   font-size: 12px;
   font-weight: 700;
 }
-.save-footer { border-top-color: #c6d2e0; }
+:host .save-footer { border-top-color: #c6d2e0; }
 .save-footer button { min-height: 38px; font-weight: 700; }
 
 @media (max-width: 800px) {
-  .screen { padding: 12px; }
+  :host .screen { padding: 12px; }
   .selected-summary { align-items: flex-start; }
   .summary-note { width: 100%; margin-left: 0; }
 }
