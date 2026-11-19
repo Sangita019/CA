@@ -1,6 +1,20 @@
 :host { display: inline-flex; }
-.status-chip { display: inline-flex; align-items: center; max-width: 100%; padding: 4px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; line-height: 1.35; white-space: nowrap; }
-.status-chip--neutral { background: #f0f2f5; color: #596579; }
-.status-chip--info { background: #e7f1fb; color: #245f91; }
-.status-chip--success { background: #e5f3e9; color: #267447; }
-.status-chip--warning { background: #fff2d8; color: #8b5b12; }
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 27px;
+  padding: 5px 11px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+  white-space: nowrap;
+  letter-spacing: .01em;
+  box-shadow: 0 1px 2px rgb(24 55 94 / 10%);
+}
+.status-chip--neutral { border-color: #b9cce4; background: #e7effa; color: #244d80; }
+.status-chip--info { border-color: #9bbce5; background: #dceaff; color: #174c8d; }
+.status-chip--success { border-color: #8bc5a2; background: #dff3e7; color: #145d37; }
+.status-chip--warning { border-color: #e3c477; background: #fff0c9; color: #79530a; }
